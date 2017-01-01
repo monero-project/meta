@@ -10,7 +10,7 @@ case "$OSTYPE" in
     _path="$HOME/.bin"
     ;;
   darwin*)
-    _data="$HOME/Library/Application\ Support/Kovri"
+    _data="$HOME/Library/Application Support/Kovri"
     _path="$HOME/Library/Desktop"
     ;;
   freebsd*)
@@ -39,7 +39,7 @@ _binary="kovri"
 # Move resources
 mkdir "$_data" && mv $(ls -A . | grep -v $(basename "$0")) "$_data" && mv "${_data}/${_binary}" "$_path"
 
-if [ $? -eq 1 ]; then
+if [ $? -ne 0 ]; then
   echo "Failed to install. See above error messages"
   exit 1
 fi
