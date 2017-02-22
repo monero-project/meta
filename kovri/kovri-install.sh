@@ -88,13 +88,14 @@ fi
 # Remove existing install
 _core=${_data}/core
 _client=${_data}/client
-_installed="$_core $_client/address_book/addresses* $_client/certificates"
-
-if [[ -d $_installed ]]; then
-  echo -n "Removing existing install"
-  rm -fr $_installed
-  catch "could not remove existing install"
-fi
+_installed=($_core $_client/address_book/addresses $_client/address_book/addresses.csv $_client/certificates)
+for _i in ${_installed[@]}; do
+  if [[ -e $_i ]]; then
+    echo -n "Removing $_i"
+    rm -fr $_i
+    catch "could not remove $_i"
+  fi
+done
 
 # Create new install
 _path=$HOME/bin
