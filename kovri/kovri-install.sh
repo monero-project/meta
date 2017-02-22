@@ -40,7 +40,7 @@ if [[ $(tput colors) ]]; then
   _normal="$(tput sgr0)"
 fi
 
-_banner="${_yellow}The Kovri I2P Router Project Installer${_normal}"
+_banner="${_yellow}The Kovri I2P Router Project (c) 2017${_normal}"
 echo $_banner
 
 # Error handler
