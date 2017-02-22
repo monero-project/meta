@@ -31,37 +31,56 @@ REM THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 SET _banner=The Kovri I2P Router Project Installer
 SET _data=%APPDATA%\Kovri
 
+REM
 REM Backup existing installation
+REM
+
 SET _config=%_data%\config
 SET _kovri_conf=%_config%\kovri.conf
 SET _tunnels_conf=%_config%\tunnels.conf
 
-REM TODO(anonimal): implement
-REM IF EXIST "%_config%%" (
-REM   ECHO Begin configuration backup...
-REM   IF EXIST "%_kovri_conf%" (
-REM     MOVE /Y "%_kovri_conf%" "%_kovri_conf%".bak
-REM   )
-REM   IF EXIST "%_tunnels_conf%" (
-REM     MOVE /Y "%_tunnels_conf%" "%_tunnels_conf%".bak
-REM   )
-REM   CALL :catch could not backup configuration
-REM )
+IF EXIST "%_config%%" (
+  ECHO Begin configuration backup...
+  IF EXIST "%_kovri_conf%" (
+    ECHO Backing up "%_kovri_conf%"
+    COPY /Y "%_kovri_conf%" "%_kovri_conf%".bak
+  )
+  IF EXIST "%_tunnels_conf%" (
+    ECHO Backing up "%_tunnels_conf%"
+    COPY /Y "%_tunnels_conf%" "%_tunnels_conf%".bak
+  )
+  CALL :catch could not backup configuration
+)
 
+REM
 REM Remove existing install
+REM
+
 SET _core=%_data%\core
 SET _client=%_data%\client
-SET _installed[0]="%_core%"
-SET _installed[1]="%_client%\address_book\addresses"
-SET _installed[2]="%_client%\address_book\addresses.csv"
-SET _installed[3]="%_client%\certificates"
-
-REM TODO(anonimal): implement
-REM FOR /F "tokens=2 delims==" %%s IN ('set _installed[') DO IF EXIST %%s (ECHO Removing %%s && DEL /S /Q %%s)
+SET _installed[0]=%_core%
+SET _installed[1]=%_client%\address_book\addresses
+SET _installed[2]=%_client%\address_book\addresses.csv
+SET _installed[3]=%_client%\certificates
+FOR /F "tokens=2 delims==" %%s IN ('set _installed[') DO (
+  IF EXIST %%s\* (
+    REM Remove directory
+    ECHO Removing %%s
+    RMDIR /S /Q %%s
+  )
+  IF EXIST %%s (
+    REM Remove file
+    ECHO Removing %%s
+    DEL /F /S /Q %%s
+  )
+)
 CALL :catch could not remove existing install
 
+REM
 REM Create new install
+REM
 REM TODO(anonimal): Install to Program Files?
+
 SET _path=%USERPROFILE%\Desktop
 SET _binary=kovri.exe
 
@@ -81,8 +100,13 @@ SET _resources[0]=client
 SET _resources[1]=config
 SET _resources[2]=%_binary%
 
-REM TODO(anonimal): prefer to copy
-FOR /F "tokens=2 delims==" %%s IN ('set _resources[') DO IF %%s == %_binary% (MOVE /Y %%s "%_path%") else (MOVE /Y %%s "%_data%")
+FOR /F "tokens=2 delims==" %%s IN ('set _resources[') DO (
+  IF %%s == %_binary% (
+    COPY /Y %%s "%_path%"
+  ) ELSE (
+    XCOPY /F /S /E /Y %%s\* "%_data%"\%%s\*
+  )
+)
 CALL :catch could not install resources
 
 ECHO Installation success!
