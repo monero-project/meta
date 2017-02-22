@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright (c) 2017, The Kovri I2P Router Project
+# Copyright (c) 2015-2017, The Kovri I2P Router Project
 #
 # All rights reserved.
 #
@@ -40,7 +40,7 @@ if [[ $(tput colors) ]]; then
   _normal="$(tput sgr0)"
 fi
 
-_banner="${_yellow}The Kovri I2P Router Project (c) 2017${_normal}"
+_banner="${_yellow}The Kovri I2P Router Project (c) 2015-2017${_normal}"
 echo $_banner
 
 # Error handler

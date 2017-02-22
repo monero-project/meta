@@ -1,5 +1,5 @@
-The Kovri I2P Router Project (c) 2017
-=====================================
+The Kovri I2P Router Project (c) 2015-2017
+==========================================
 
 Linux/OSX/BSD/MSYS2
 -------------------
