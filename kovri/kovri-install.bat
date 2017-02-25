@@ -112,6 +112,7 @@ CALL :catch could not install resources
 ECHO Data directory is "%_data%"
 ECHO Binaries are located in "%_path%"
 ECHO Installation success!
+IF %0 == "%~0" PAUSE
 
 :catch
 IF %ERRORLEVEL% NEQ 0 (
