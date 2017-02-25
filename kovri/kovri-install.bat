@@ -82,7 +82,6 @@ REM
 REM TODO(anonimal): Install to Program Files?
 
 SET _path=%USERPROFILE%\Desktop
-SET _binary=kovri.exe
 
 IF NOT EXIST "%_data%%" (
   ECHO Creating "%_data%"
@@ -98,17 +97,20 @@ IF NOT EXIST "%_path%%" (
 
 SET _resources[0]=client
 SET _resources[1]=config
-SET _resources[2]=%_binary%
+SET _resources[2]=kovri.exe
+SET _resources[3]=kovri-util.exe
 
 FOR /F "tokens=2 delims==" %%s IN ('set _resources[') DO (
-  IF %%s == %_binary% (
-    COPY /Y %%s "%_path%"
-  ) ELSE (
+  IF EXIST %%s\* (
     XCOPY /F /S /E /Y %%s\* "%_data%"\%%s\*
+  ) ELSE (
+    COPY /Y %%s "%_path%"
   )
 )
 CALL :catch could not install resources
 
+ECHO Data directory is "%_data%"
+ECHO Binaries are located in "%_path%"
 ECHO Installation success!
 
 :catch

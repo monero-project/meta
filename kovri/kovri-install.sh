@@ -99,7 +99,6 @@ done
 
 # Create new install
 _path=$HOME/bin
-_binary=kovri
 
 if [[ ! -d $_data ]]; then
   echo -n "Creating ${_data}"
@@ -113,9 +112,9 @@ if [[ ! -d $_path ]]; then
   catch "could not create $_path"
 fi
 
-_resources=(client config $_binary)
+_resources=(client config kovri kovri-util)
 for _i in ${_resources[@]}; do
-  if [[ $_i != $_binary ]]; then
+  if [[ -d $_i ]]; then
     echo -n "Copying $_i to $_data"
     cp -fR $_i "$_data"
   else
