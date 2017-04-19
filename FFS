@@ -1,0 +1,20 @@
+## Funding, work start, payments
+
+1. The project can begin before it's fully funded
+2. Devs can be paid for milestone completion before it's fully funded
+3. If the dev disappears, no problem, someone else can pick up from their last milestone 
+4. If the milestones are sufficiently small the dev doesn't have to go 6 months without pay
+
+## Ideal FFS Workflow
+
+1. An idea is presented in the **IDEAS** thread. A discussion occurs regarding whether the idea should be developed.
+2. A developer (who either presented the idea, or saw the idea and realizes they can develop it) pitches their proposal to develop the idea in the **OPEN TASKS** section. At a minimum, this pitch should include
+
+**What** - describe the idea and how you plan to develop it  
+**Who** - who are you? Why do you think you can develop it, and why should the Monero community believe you can?  
+**Why** - Why do you want to develop this?  
+**The Proposal and Milestones** - It is difficult to describe how each proposal should be broken down into milestones, but only you (the developer) knows how long things can take, and knows how to break the task apart.  
+**Expiration** - Make it apparent that a time limit exists for the proposal. If the project is abandoned, funds will eventually be re-appropriated at the discretion of the core developers. At the minimum, development should start coding "soon" after the funding target has been met in order to avoid re-appropriation. 
+
+3. The community discusses the proposal. The proposal is amended, etc. Eventually the community approves, and the proposal is moved to **FUNDING REQUIRED** by a moderator. Here, funding occurs. People may or may not post that they have contributed. It is not necessary to post your contributions, though it is fine.
+4. Once fully funded, or development begins, the thread is moved to the **WORK IN PROGRESS* thread, where the developer is expected to provide some kind of activity report. 
