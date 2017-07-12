@@ -1,5 +1,13 @@
 # Forum Funding System Terms & Conditions
 
+## Prelude (a note about the community)
+
+We apologize if these terms seem overly strict or harsh. The community of Monero is really a very welcoming and friendly place. We just want to ensure that we have an environment that is fair, encourages innovation, protects the money of contributors, and protects contractors. In other words, we want a [smooth](https://github.com/iamsmooth) FFS experience for everyone, contractors and contributors alike.
+
+We all want Monero to succeed, and we've got an awesome community that can make it happen. Let's just treat each other well, be honest with each other about anything unexpected that may arise, and make reasonable arguments for or against something, and, you know, be adults. In doing so, we shouldn't have any issues.
+
+Hopefully.
+
 ## Introduction
 This document is written in order to clearly outline the expectations of the Monero community of a FFS proposal and the individual or team (hereafter 'contractor') that will fulfill it. By submitting a proposal, you agree that you have read and understood these terms, and failure to comply with these terms will lead to an investigation that may lead to the dismissal of the noncompliant individual from the FFS project. These terms are not legally binding, as Monero is not a corporation, but if you do not follow them you there will be many issues with fulfilling the contract and receiving your payments. So if you value your time and wish to be compensated for your work, then following these terms is advised.
 
@@ -50,12 +58,3 @@ The investigative team is write up their conclusion and present to the community
 In the event that a contract leaves a proposal or is dismissed, but he/she has, in the time that followed, proven their goodwill, they can make an appeal to the community to resume the contract, assuming another contractor hasn't already picked up the proposal. They can provide whatever evidence they think will be helpful in convincing the community to let them resume their previous work.
 
 Should the community decide to allow the contractor to resume his/her work, he/she may begin immediately. Should they decide not to, the contractor is expected not to be a baby about it.
-
-## Conclusion (a note about the community)
-This conclusion is in plain terms and in non-official voice, so is not expected to be taken with the weight of the above terms.
-
-We apologize if these terms seem overly strict or harsh. The community of Monero is really a very welcoming and friendly place. We just want to ensure that we have an environment that is fair, encourages innovation, protects the money of contributors, and protects contractors. In other words, we want a [smooth](https://github.com/iamsmooth) FFS experience for everyone, contractors and contributors alike.
-
-We all want Monero to succeed, and we've got an awesome community that can make it happen. Let's just treat each other well, be honest with each other about anything unexpected that may arise, and make reasonable arguments for or against something, and, you know, be adults. In doing so, we shouldn't have any issues.
-
-Hopefully.
