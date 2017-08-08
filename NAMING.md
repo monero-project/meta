@@ -6,122 +6,121 @@ Below is a list of elements and galactic bodies, as prepared by palexander.
 
 | Elements | Galaxies, Messier Objects | 
 | ------- | ------- | 
-| Hydrogen | Ambartsumian's Knot | 
-| Helium | Andromeda | 
-| Lithium | Antennae | 
-| Beryllium | Aquarius Dwarf| 
-| Boron | Arp's | 
-| Carbon | Atom For Peace | 
-| Nitrogen | Baade's | 
-| Oxygen | Barbon's | 
-| Fluorine | Barnard's | 
-| Neon | Bears Paw | 
-| Sodium | BL Lacertae | 
-| Magnesium | Black Eye | 
-| Aluminium | Bode's | 
-| Silicon | Burbidge Chain | 
-| Phosphorus | BW Tauri | 
-| Sulfur | Capricorn Dwarf| 
-| Chlorine | Carafe | 
-| Argon | Carina Dwarf| 
-| Potassium | Cartwheel | 
-| Calcium | Centauras A| 
-| Scandium | Circinus | 
-| Titanium | Coddington's Nebula| 
-| Vanadium | Copeland Septet | 
-| Chromium | Cygnus A| 
-| Manganese | Draco Dwarf| 
-| Iron | Exclamation Mark | 
-| Cobalt | The Eyes | 
-| Nickel | Fath 703 | 
-| Copper | Fornax A | 
-| Zinc | Fourcade-Figuero | 
-| Gallium | The Garland | 
-| Germanium | Grus Quartet | 
-| Arsenic | Gibson Reaves | 
-| Selenium | Hardcastle's | 
-| Bromine | Helix | 
-| Krypton | Hercules A | 
-| Rubidium | Hoag's Object | 
-| Strontium | Holmberg I| 
-| Yttrium | Horologium Dwarf | 
-| Zirconium | Hydra A | 
-| Niobium | Integral Sign | 
-| Molybdenum | Keenan's System | 
-| Technetium | Kowal's Object | 
-| Ruthenium | Large Magellanic Cloud | 
-| Rhodium | Leo Triplet | 
-| Palladium | Lindsay-Shapley Ring | 
-| Silver | Lost | 
-| Cadmium | McLeish's Object | 
-| Indium | Maffei I | 
-| Tin | Malin 1 | 
-| Antimony | Mayall's Object | 
-| Tellurium | Mice | 
-| Iodine | Miniature Spiral | 
-| Xenon | Minkowski's Object | 
-| Caesium | Pancake | 
-| Barium | Papillon | 
-| Lanthanum | Pegasus Dwarf | 
-| Cerium | Perseus A | 
-| Praseodymium | Phoenix Dwarf Irregular G. | 
-| Neodymium | Pinwheel | 
-| Promethium | Pisces Cloud | 
-| Samarium | Polarissima Australis | 
-| Europium | Reinmuth 80 | 
-| Gadolinium | Reticulum Dwarf | 
-| Terbium | Sagittarius Dwarf | 
-| Dysprosium | Sculptor Dwarf | 
-| Holmium | Seashell | 
-| Erbium | Serpens Dwarf | 
-| Thulium | Sextans A | 
-| Ytterbium | Seyfert's Sextet | 
-| Lutetium | Shapley-Ames 1 | 
-| Hafnium | Siamese Twins | 
-| Tantalum | Silver Coin | 
-| Tungsten | Small Magellanic Cloud | 
-| Rhenium | Sombrero | 
-| Osmium | Spider | 
-| Iridium | Spindle | 
-| Platinum | Stephan's Quintet | 
-| Gold | Sunflower | 
-| Mercury | Triangulum | 
-| Thallium | Ursa Minor Dwarf | 
-| Lead | Virgo A | 
-| Bismuth | Whirlpool | 
-| Polonium | Wild's Triplett | 
-| Astatine | Wolf-Lundmark-Melotte | 
-| Radon | Zwicky's Triplet | 
-| Francium | Comet |
-| Radium   | Milky Way |
-| Actinium | Tadpole |
-| Thorium  | Hanny's Object |
-| Protactinium | Hucra's Lens |
-| Uranium  | Komossa's Object |
-| Neptunium | Wilman 1 |
-| Plutonium | Tucana Dwarf |
-| Americium | Antila |
-| Curium   | Dwingeloo |
-| Berkelium | Crab Nebula  |
-| Californium         | Butterfly Cluster |
-| Einsteinium         | Ptolemy Cluster |
-| Fermium         | Lagoon Nebula  |
-| Mendelevium         | Wild Duck Cluster|
-| Nobelium         | Great Globular Cluster |
-| Lawrencium         | Eagle Nebula |
-| Rutherfordium         | Horseshoe Nebula |
-| Dubnium         | Trifid Nebula  |
-| Seaborgium         | Dumbbell Nebula   |
-| Bohrium         | Orion Nebula |
-| Hassium         | De Mairan's Nebula  |
-| Meitnerium         | Beehive Cluster   |
-| Darmstadtium         | Pleiades|
-| Roentgenium         | Ring Nebula|
-| Copernicium         | Little Dumbbell Nebula |
-| Ununtrium         | Cigar Galaxy |
-| Flerovium         | Owl Nebula |
-| Ununpentium         | Southern Pinwheel Galaxy |
-| Livermorium         | Cetus A Galaxy |
-| Ununseptium         | Winnecke 4 |
-| Ununoctium         | Sagittarius Star Cloud  |
-
+| Hydrogen | Ambartsumian's Knot |
+| Helium | Andromeda |
+| Lithium | Antennae |
+| Beryllium | Antila |
+| Boron | Aquarius Dwarf |
+| Carbon | Arp's |
+| Nitrogen | Atom For Peace |
+| Oxygen | Baade's |
+| Fluorine | Barbon's |
+| Neon | Barnard's |
+| Sodium | Bears Paw |
+| Magnesium | Beehive Cluster |
+| Aluminium | BL Lacertae |
+| Silicon | Black Eye |
+| Phosphorus | Bode's |
+| Sulfur | Burbidge Chain |
+| Chlorine | Butterfly Cluster |
+| Argon | BW Tauri |
+| Potassium | Capricorn Dwarf |
+| Calcium | Carafe |
+| Scandium | Carina Dwarf |
+| Titanium | Cartwheel |
+| Vanadium | Centauras A |
+| Chromium | Cetus A Galaxy |
+| Manganese | Cigar Galaxy |
+| Iron | Circinus |
+| Cobalt | Coddington's Nebula |
+| Nickel | Comet |
+| Copper | Copeland Septet |
+| Zinc | Crab Nebula |
+| Gallium | Cygnus A |
+| Germanium | De Mairan's Nebula |
+| Arsenic | Draco Dwarf |
+| Selenium | Dumbbell Nebula |
+| Bromine | Dwingeloo |
+| Krypton | Eagle Nebula |
+| Rubidium | Exclamation Mark |
+| Strontium | Fath 703 |
+| Yttrium | Fornax A |
+| Zirconium | Fourcade-Figuero |
+| Niobium | Gibson Reaves |
+| Molybdenum | Great Globular Cluster |
+| Technetium | Grus Quartet |
+| Ruthenium | Hanny's Object |
+| Rhodium | Hardcastle's |
+| Palladium | Helix |
+| Silver | Hercules A |
+| Cadmium | Hoag's Object |
+| Indium | Holmberg I |
+| Tin | Horologium Dwarf |
+| Antimony | Horseshoe Nebula |
+| Tellurium | Hucra's Lens |
+| Iodine | Hydra A |
+| Xenon | Integral Sign |
+| Caesium | Keenan's System |
+| Barium | Komossa's Object |
+| Lanthanum | Kowal's Object |
+| Cerium | Lagoon Nebula |
+| Praseodymium | Large Magellanic Cloud |
+| Neodymium | Leo Triplet |
+| Promethium | Lindsay-Shapley Ring |
+| Samarium | Little Dumbbell Nebula |
+| Europium | Lost |
+| Gadolinium | Maffei I |
+| Terbium | Malin 1 |
+| Dysprosium | Mayall's Object |
+| Holmium | McLeish's Object |
+| Erbium | Mice |
+| Thulium | Milky Way |
+| Ytterbium | Miniature Spiral |
+| Lutetium | Minkowski's Object |
+| Hafnium | Orion Nebula |
+| Tantalum | Owl Nebula |
+| Tungsten | Pancake |
+| Rhenium | Papillon |
+| Osmium | Pegasus Dwarf |
+| Iridium | Perseus A |
+| Platinum | Phoenix Dwarf Irregular G. |
+| Gold | Pinwheel |
+| Mercury | Pisces Cloud |
+| Thallium | Pleiades |
+| Lead | Polarissima Australis |
+| Bismuth | Ptolemy Cluster |
+| Polonium | Reinmuth 80 |
+| Astatine | Reticulum Dwarf |
+| Radon | Ring Nebula |
+| Francium | Sagittarius Dwarf |
+| Radium | Sagittarius Star Cloud |
+| Actinium | Sculptor Dwarf |
+| Thorium | Seashell |
+| Protactinium | Serpens Dwarf |
+| Uranium | Sextans A |
+| Neptunium | Seyfert's Sextet |
+| Plutonium | Shapley-Ames 1 |
+| Americium | Siamese Twins |
+| Curium | Silver Coin |
+| Berkelium | Small Magellanic Cloud |
+| Californium | Sombrero |
+| Einsteinium | Southern Pinwheel Galaxy |
+| Fermium | Spider |
+| Mendelevium | Spindle |
+| Nobelium | Stephan's Quintet |
+| Lawrencium | Sunflower |
+| Rutherfordium | Tadpole |
+| Dubnium | The Eyes |
+| Seaborgium | The Garland |
+| Bohrium | Triangulum |
+| Hassium | Trifid Nebula |
+| Meitnerium | Tucana Dwarf |
+| Darmstadtium | Ursa Minor Dwarf |
+| Roentgenium | Virgo A |
+| Copernicium | Whirlpool |
+| Ununtrium | Wild Duck Cluster |
+| Flerovium | Wild's Triplett |
+| Ununpentium | Wilman 1 |
+| Livermorium | Winnecke 4 |
+| Ununseptium | Wolf-Lundmark-Melotte |
+| Ununoctium | Zwicky's Triplet |
