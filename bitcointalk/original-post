@@ -1,0 +1,191 @@
+[center]
+[size=14pt][b][size=20pt]›››[/size] [url=http://downloads.getmonero.org/win64]Windows 64-bit[/url] • [url=http://downloads.getmonero.org/mac]OS X[/url] • [url=http://downloads.getmonero.org/linux]Linux[/url] • [url=http://downloads.getmonero.org/freebsd]FreeBSD[/url] •  [url=https://github.com/monero-project/bitmonero]Source code[/url] [size=20pt]‹‹‹[/size][/b][/size]
+
+[center][size=12pt]We are [url=https://plus.google.com/+DavidLatapie/posts/9PxC9Xb5uzg]moving away from Bitcointalk[/url]. For latest information, check out [url=https://forum.getmonero.org/1/news-announcements-and-editorials]News, announcements and editorials[/url] on the [url=https://forum.getmonero.org/]official forum[/url][/size][/center]
+
+[IMG]http://i59.tinypic.com/59u1yg.png[/img]
+[url=http://www.getmonero.org/][b]Website: getmonero.org[/b][/url]
+[url=https://forum.getmonero.org]Official Forum: forum.getmonero.org[/url]
+
+[url=https://bitcointalk.org/index.php?topic=597878]Monero Economy[/url]  •  [url=https://bitcointalk.org/index.php?topic=652305]Monero Support[/url]* •  [url=https://bitcointalk.org/index.php?topic=653467]Monero Mining[/url]  •  [url=https://bitcointalk.org/index.php?topic=753252]Monero Speculation[/url]*  •  [url=https://bitcointalk.org/index.php?topic=696620]Monero Dev[/url]*  •  [url=https://bitcointalk.org/index.php?topic=716331]Monero large OTC[/url]
+[i]* self-moderated[/i]
+
+#monero  •  #monero-dev  •  #monero-otc  •  #monero-markets  •  #monero-pools  •  QQ Group: 272729907
+[i](Freenode)[/i]
+
+[url=https://twitter.com/monerocurrency][img]http://i.imgur.com/YEDcjbV.png[/img][/url] [url=http://www.reddit.com/r/monero][img]http://i.imgur.com/xVEG9un.png[/img][/url] [url=https://www.facebook.com/monerocurrency][img]http://i.imgur.com/6Y4lJbg.png[/img][/url] [url=https://plus.google.com/101861896996947433029/posts][img]http://i.imgur.com/VY867Q0.png[/img][/url]
+[/center]
+
+Monero (XMR) is a privacy-focused cryptocurrency that is not based on Bitcoin's code.
+
+Monero aims to be a fungible and untraceable digital medium of exchange. It intrinsically has a higher degree of privacy than Bitcoin or any of its various forks. It was launched on April 18, 2014 (preannounced and no premine/ICO/etc.).
+
+The official core team members are (in no particular order) - Riccardo "fluffypony" Spagni, luigi1111, NoodleDoodle, smooth, tacotime, Franciso "ArticMine" Cabañas, othe
+
+[size=12pt][b]Announcements[/b][/size]
+Please visit [url=https://forum.getmonero.org/1/news-announcements-and-editorials]News, announcements and editorials[/url] on the Monero Forum for the latest news.
+Visit our [url=http://monero.stackexchange.com/]StackExchange[/url] site, where you can ask, answer, and view technical questions!
+
+[size=12pt][b]Features[/b][/size]
+
+[list]
+[li]Untraceable payments[/li]
+[li]Unlinkable transactions[/li]
+[li]Blockchain analysis resistance[/li]
+[li]Adaptive parameters[/li]
+[/list]
+
+[size=12pt][b]Academic and Theory[/b][/size]
+
+Monero's functionality is backed up by academic research and cryptographically proven schemes. Much of this research is done by the Monero Research Lab. Since Monero was initially based on the CryptoNote protocol, the CryptoNote whitepaper is also an invaluable reference for validating Monero's unlinkability and untraceability claims.
+
+[list]
+[li][url=https://cryptonote.org/whitepaper.pdf]The CryptoNote Whitepaper[/url][/li]
+[li][url=http://downloads.getmonero.org/whitepaper_review.pdf]Initial Review of the CryptoNote Whitepaper[/url][/li]
+[li][url=https://lab.getmonero.org/pubs/MRL-0001.pdf]MRL-0001: A Note on Chain Reactions in Traceability in CryptoNote 2.0[/url][/li]
+[li][url=https://lab.getmonero.org/pubs/MRL-0002.pdf]MRL-0002: Counterfeiting via Merkle Tree Exploits within Virtual Currencies Employing the CryptoNote Protocol[/url][/li]
+[li][url=https://lab.getmonero.org/pubs/MRL-0003.pdf]MRL-0003: Monero is Not That Mysterious[/url][/li]
+[li][url=https://lab.getmonero.org/pubs/MRL-0004.pdf]MRL-0004: Improving Obfuscation in the CryptoNote Protocol[/url][/li]
+[li][url=https://lab.getmonero.org/pubs/MRL-0005.pdf]MRL-0005: Ring Signature Confidential Transactions[/url][/li]
+[/list]
+
+[size=12pt][b]Specifications[/b][/size]
+
+[list]
+[li]PoW algorithm: CryptoNight [size=7pt][1][/size][/li]
+[li]Max supply: Infinite (see note below) [size=7pt][2][/size][/li]
+[li]Block reward: Smoothly varying [size=7pt][3][/size][/li]
+[li]Block time: 120 seconds[/li]
+[li]Difficulty: Retargets at every block[/li]
+[/list]
+
+[size=7pt][1][/size] CPU + GPU mining (about 1:1 performance for now). Memory-bound by design using AES encryption and several SHA-3 candidates.
+[size=7pt][2][/size] Initial number of atomic units is M = 2[sup]64[/sup] - 1. However, once the block reward reaches 0.3 XMR per minute (sometime in 2022) that is treated as the minimum subsidy, which means that Monero's total emission will forever increase by ~157680 XMR annually.
+[size=7pt][3][/size] Uses a recurrence relation. Block reward = (M - A) * 2[sup]-20[/sup] * 10[sup]-12[/sup], where A = current circulation. Roughly 86% mined in 4 years (see [url=http://i.imgur.com/lDqIdyd.png]graph[/url]).
+
+
+[size=14pt][b]Official downloads and links[/b][/size]
+
+[url=http://getmonero.org/getting-started][size=12pt][b]Getting Started[/b][/url] - Follow the guide to set up the software and start mining.
+
+[url=https://forum.getmonero.org]Official forum[/url]
+
+[size=12pt][b]Source and binaries[/b][/size]
+[i]Also see below for optional GUI.[/i]
+
+Latest release: 0.10.1.0 [i]Wolfram Warptangent[i]
+
+[list]
+[li][url=https://github.com/monero-project/monero][b]Source code[/b][/url][/li]
+[li][url=http://downloads.getmonero.org/win64]Windows, 64-bit (downloads.getmonero.org/win64)[/url] - SHA256: 727a53dd154b61fd653f81da27788077fdf519301c81d3c1eb033c1ff2bf97c6[/li]
+[li][url=http://downloads.getmonero.org/win64]Windows, 32-bit (downloads.getmonero.org/win32)[/url] - SHA256: ce77137b33bcaeb59273cb73b86e426e35e6209fb52a7e74fd9432a5a3018041[/li]
+[li][url=http://downloads.getmonero.org/mac]OS X, 64-bit (downloads.getmonero.org/mac64)[/url] - SHA256: 447cebae257864b3706a8622f495bfd9fae780a6b277e1e31ac83bef7bc855c6[/li]
+[li][url=http://downloads.getmonero.org/linux]Linux, 64-bit (downloads.getmonero.org/linux64)[/url] - SHA256: bf09eea27c957e7e2bdd62dac250888b301d4d25abe18d4a5b930fa7477708c7[/li]
+[li][url=http://downloads.getmonero.org/linux]Linux, 32-bit (downloads.getmonero.org/linux32)[/url] - SHA256: 9a18d274970df85d6bc926dc99407959c680c36f19017996be9c758f6c02cf06[/li]
+[li][url=http://downloads.getmonero.org/arm]ARMv7 (downloads.getmonero.org/arm)[/url] - SHA256: 57221605997a3cd815f2a9689486abbdb124263fff047ca61068900eb7cb1839[/li]
+[li][url=http://downloads.getmonero.org/arm]FreeBSD 64-bit (downloads.getmonero.org/freebsd64)[/url] - SHA256: 3858d4786b65a37e981b142e9c0f256ac66662314794d05f595c4c30cb5b6ddb[/li]
+[/list]
+
+[size=12pt][b]Donations for general development[/b][/size]
+
+[b]XMR:[/b] [code]
+address (OpenAlias) donate.getmonero.org
+address (full) 44AFFq5kSiGBoZ4NMDwYtN18obc8AemS33DBLWs3H7otXft3XjrpDtQGv7SqSsaBYBb98uNbr2VBBEt7f2wfn3RVGQBEP3A
+viewkey: f359631075708155cc3d92a32b75a7d02a5dcf27756707b47a2b31b21c389501[/code]
+
+[b]BTC:[/b] [code]1KTexdemPdxSBcG55heUuTjDRYqbC5ZL8H[/code]
+
+[url=https://bitcointalk.org/index.php?topic=700400]Monero Community Hall of Fame[/url]
+
+[size=12pt][b]Alternative Clients[/b][/size]
+
+Please visit: [url=http://getmonero.org/getting-started/choose]How to choose a Monero client[/url]
+
+[size=12pt][b]Miners[/b][/size]
+[list]
+[li]CPU, open source - [url=https://bitcointalk.org/index.php?topic=632724]Wolf`'s CPU miner[/url].[/li]
+[li]CPU, closed source - [url=https://mega.co.nz/#F!h0tkXSxZ!f62uoUXogkxQmP2xO8Ib-g]yvg1900 - Yam M8a Miner[/url] [i] New version - use at your own risk. [/i][/li]
+[li]GPU, open source - [url=https://bitcointalk.org/index.php?topic=656841.msg7487737#msg7487737]Tsiv Nvidia GPU Miner (based on ccminer)[/url] [i]Early in development - Thanks Tsiv![/i][/li]
+[li]GPU, closed source - [url=https://bitcointalk.org/index.php?topic=638915.0]Claymore AMD GPU miner[/url] - [i]Early in development - use at your own risk.[/i][/li]
+[/list]
+
+[size=12pt][b]Blockchain explorer[/b][/size]
+
+[list]
+[li][url=http://moneroblocks.info/]moneroblocks.info[/url][/li]
+[li][url=http://chainradar.com/xmr/blocks]chainradar[/url][/li]
+[/list]
+
+[size=12pt][b]Exchanges, Services, and Related Projects[/b][/size]
+
+Please visit [url=https://getmonero.org/getting-started/merchants]Merchants and services directory[/url]
+
+[size=12pt][b]Pools[/b][/size]
+
+For an up-to-date list of pools, go to [url=http://moneropools.com]http://moneropools.com[/url]
+
+[size=12pt][b]FAQ[/b][/size]
+For a longer FAQ, check [url=https://bitcointalk.org/index.php?topic=721045]Community FAQ[/url]
+
+[b]What is CryptoNote?[/b]
+CryptoNote is the technology that allows creation of privacy-centric cryptocurrencies. You can visit their website here. The level of anonymity provided by CryptoNote isn't possible with Bitcoin code base by design. Bytecoin (BCN) was the CryptoNote reference implementation, and XMR is based on BCN's code.
+
+Two of the main features of CryptoNote are ring signatures that mask sender identities by mixing and one-time keys that make transactions unlinkable. Their combined effect gives a high degree of anonymity without any extra effort on the part of the user.
+
+Unlike Bitcoin, your funds are not held in the address you give out to others. Instead, every time you receive a payment it goes to an unlinkable address generated with random numbers. When you decide to spend the funds in that one-time address, the amount will be broken down and the components will be indistinguishable from identical outputs in the blockchain.
+
+For example if 556.44 XMR are sent, the protocol will break it down into 500 + 50 + 6 + 0.4 + 0.04 and a ring signature will be performed with other 500's, 50's, 6's, 0.4's, and 0.04's in the blockchain. Unlike the "CoinJoin" mixing method, CryptoNote mixes outputs not transactions. This means no other senders need to be participating with you at the same time or with the same amounts. Any arbitrary amount sent at any time can always be rendered fundamentally indistinguishable (a mathematical proof is given in the white paper).
+
+The degree of anonymity is also a choice rather than decided by the protocol: do you want to be hidden as one among five or one among fifty? The size of the signature grows linearly as O(n+1) with the ambiguity so greater anonymity is paid for with higher fees to miners.
+
+Ring signatures are explained below. Reproduced from CryptoNote:
+
+A normal signature looks like this. There's only one participant, which allows one-to-one mapping.
+
+[img]http://i.imgur.com/dcbDq05.png[/img]
+
+A ring signature obscures identities because it only proves that a signer belongs to a group.
+
+[img]http://i.imgur.com/avTQPnT.png[/img]
+
+This allows a high level of anonymity in cryptocurrency transactions. You can think of it as decentralized and trustless mixing.
+
+[img]http://i.imgur.com/ioewLSY.png[/img]
+
+[b]How does this compare to other anonymous solutions?[/b]
+Ring signatures originate from the work of Rivest et al. in 2001 and the implementation in CryptoNote relies in particular on Fujisaki and Suzuki's work on traceable ring signatures. There are two other anonymity implementations currently available or in development. One is ZeroCoin/ZeroCash's use of zero-knowledge proofs. The others are based on gmaxwell's CoinJoin idea (such as mixing services for Bitcoin or the altcoin Darkcoin).
+
+[b]1. Comparison with ZeroCoin and ZKP-based approaches:[/b]
+You can read about ZeroCoin and zero-knowledge proofs (ZKP) here. The ZK environment allows an anonymity set that includes everyone in the network because the validity of an output can be proven without knowing the corresponding public key until it is spent. The largest risk is that this is recent research-level cryptography that hasn't been subjected to years of cryptanalysis, so exploits may emerge down the road. Ring signatures are much simpler and more mature, with many peer-reviewed papers published over more than a decade.
+
+Other issues with ZKP include the RSA private key used to initiate the accumulator, which must be trusted to be destroyed by the generating party. It also obscures the entire economy, not just sender/receiver identities. If the ZK system is compromised, then an attacker can continuously spend coins that don't exist using false proofs. This damage is hidden from everybody due to total blinding and consequently at any given time it's not possible to know if the network has already been compromised. There is a tradeoff between these inherent risks and the maximal anonymity set provided by ZKP. CryptoNote aims for a different balance through the dual layers of privacy provided by one-time keys and ring signatures.
+
+[b]2. Comparison with CoinJoin-based approaches:[/b]
+XMR is more qualitatively similar to mixing implementations like CoinJoin. The differences arise in the departure from the Bitcoin protocol, which allows XMR to use new cryptography to provide decentralized and trustless mixing of superior quality. The critical problem with mixing services is the need to trust the operators. As an example, blockchain.info's mixer gives the following disclaimer: "However if the server was compromised or under subpoena it could be force to keep logs. If this were to happen although you haven't gained any privacy you haven't lost any either."
+
+The CoinJoin-inspired Darkcoin performs mixing with selected "masternodes" since it still uses ordinary signatures that can be mapped one-to-one. The motivation is that a randomly selected node is less likely than a single service to exhibit bad faith (such as keeping logs) . In practice, a few VPS companies host the vast majority of nodes and this approach relies on the integrity and good behavior of these nodes. XMR's more fundamental cryptographic approach doesn't have these vulnerabilities and the quality of anonymity is much higher.
+
+XMR's ring signatures are also far more secure and convenient than CoinJoin because they mix outputs not transactions. This means a transaction doesn't involve waiting around for other senders to mix with. Nor is a user restricted to mixing only if others are sending the same amount. Arbitrary amounts can be sent at any time without anyone else's participation. This feature makes a timing analysis of the blockchain useless.
+
+[b]Overview of a transaction[/b]
+Bob decides to spend an output, which was sent to the one-time public key. He needs Extra [b](1)[/b], TxOutNumber [b](2)[/b], and his Account private key [b](3)[/b] to recover his one-time private key [b](4)[/b].
+
+When sending a transaction to Carol, Bob generates its Extra value by random [b](5)[/b]. He uses Extra [b](6)[/b], TxOutNumber [b](7)[/b] and Carol's Account public key [b](8[/b][b])[/b] to get her Output public key [b](9)[/b].
+
+In the input Bob hides the link to his output among the foreign keys [b](10)[/b]. To prevent double-spending he also packs the Key image, derived from his One-time private key [b](11)[/b].
+
+Finally, Bob signs the transaction, using his One-time private key [b](12)[/b], all the public keys [b](13)[/b] and Key Image [b](14)[/b]. He appends the resulting Ring Signature to the end of the transaction [b](15)[/b].
+
+[img]http://i.imgur.com/QFMVqRI.png[/img]
+
+[b]Translations[/b]
+
+[img]http://i.imgur.com/W5Dsaee.png[/img]   [url=https://bitcointalk.org/index.php?topic=604293][b][size=16pt]中文[/size][/b][/url]  (QQ Group: 272729907)
+
+[img]http://i.imgur.com/Ke1m6xC.png[/img]   [url=https://bitcointalk.org/index.php?topic=597225][b][size=12pt]Русский[/size][/b][/url]
+
+[img]http://i.imgur.com/jrOaucg.png[/img]   [url=https://bitcointalk.org/index.php?topic=563927][b][size=12pt]Português[/size][/b][/url]
+
+[img]http://i.imgur.com/JBYHU64.png[/img]   [url=https://bitcointalk.org/index.php?topic=583145][b][size=12pt]Français[/size][/b][/url]
+
+[img]http://i.imgur.com/zsveCPn.png[/img]   [url=https://bitcointalk.org/index.php?topic=622678][b][size=12pt]Español[/size][/b][/url]
