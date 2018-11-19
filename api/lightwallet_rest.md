@@ -1,6 +1,12 @@
-# Hosted Wallet API
-Discussion for the current status of the hosted wallet (mymonero/openmonero)
-API.
+# Lightwallet API
+This document describes a reference standard specification for the Monero
+lightwallet server/client API. It’s implemented by OpenMonero, MyMonero, and
+the official Monero project, and is maintained with the purpose of organizing
+and recording the consensus of Monero lightwallet API projects, and to support
+alternate implementations.
+
+Modifications to this specification should only be made with consensus of the
+projects which participate by implementing the specification.
 
 ## Encoding Schemes
 ### JSON
@@ -60,8 +66,8 @@ Information needed to spend an output.
 | rct              | binary            | Bytes of ringct data          |
 | tx_hash          | binary            | Bytes of tx hash              |
 | tx_prefix_hash   | binary            | Bytes of tx prefix hash       |
-| public_key       | binary            | Output public key             |
-| tx_pub_key       | binary            | Ephemeral ECDH key            |
+| public_key       | binary            | Bytes of output public key    |
+| tx_pub_key       | binary            | Bytes of the tx public key    |
 | spend_key_images | array of binary's | Bytes of key images           |
 | timestamp        | timestamp         | Timestamp of containing block |
 | height           | uint64            | Containing block height       |
@@ -76,9 +82,13 @@ Information needed to spend an output.
 > `tx_hash` and `tx_prefix_hash` are determined by how `monerod` computes the
 > hash.
 
-> `rct` is the concatenation of the public commitment, then the decrypted
-> ringct mask value, and finally the decrypted ringct amount value. The value
-> is returned as a single 96-byte binary blob.
+> `rct` is, for ringct outputs, a 96-byte blob containing the concatenation
+> of the public commitment, then the ringct mask value, and finally the
+> ringct amount value. For ringct coinbase outputs, the mask is always the
+> identity mask and the amount is zero; for non-coinbase ringct outputs, the
+> mask and amount are the respective raw encrypted values, which must be
+> decrypted by the client using the view secret key. For non-ringct outputs,
+> this field is nil.
 
 **rates** object
 
@@ -111,13 +121,13 @@ Information needed to spend an output.
 
 **spend** object
 
-|    Field   |      Type     |       Description        |
-|------------|---------------|--------------------------|
-| amount     | uint64-string | XMR possibly being spent |
-| key_image  | binary        | Bytes of the key image   |
-| tx_pub_key | binary        | Bytes of the tx public   |
-| out_index  | uint16        | Index of source output   |
-| mixin      | uint32        | Mixin of the spend       |
+|    Field   |      Type     |       Description          |
+|------------|---------------|----------------------------|
+| amount     | uint64-string | XMR possibly being spent   |
+| key_image  | binary        | Bytes of the key image     |
+| tx_pub_key | binary        | Bytes of the tx public key |
+| out_index  | uint16        | Index of source output     |
+| mixin      | uint32        | Mixin of the spend         |
 
 > `out_index` is a zero-based offset from the original received output. The
 > variable within the monero codebase is the `vout` array, this is the index
@@ -211,7 +221,7 @@ list of candidate spends is returned.
 | address   | base58-address | Address to retrieve                   |
 | view_key  | binary         | View key bytes for authorization      |
 
-> If `address` is not authorized, the server must return a HTTP 405
+> If `address` is not authorized, the server must return a HTTP 403
 > "Forbidden" error.
 
 **Response** object
@@ -220,7 +230,7 @@ list of candidate spends is returned.
 |----------------------|------------------|---------------------------|
 | locked_funds         | uint64-string    | Sum of unspendable XMR    |
 | total_received       | uint64-string    | Sum of received XMR       |
-| total_sent           | uint64           | Sum of possibly spent XMR |
+| total_sent           | uint64-string    | Sum of possibly spent XMR |
 | scanned_height       | uint64           | Current tx scan progress  |
 | scanned_block_height | uint64           | Current scan progress     |
 | start_height         | uint64           | Start height of response  |
@@ -243,7 +253,7 @@ spends is returned.
 | address  | base58-address | Address to retrieve                   |
 | view_key | binary         | View key bytes for authorization      |
 
-> If `address` is not authorized, the server must return a HTTP 405
+> If `address` is not authorized, the server must return a HTTP 403
 > "Forbidden" error.
 
 **Response** object
@@ -278,7 +288,7 @@ locally select outputs using a triangular distribution
 > If clients are creating multiple rings with the same amount, they must set
 > `count` to the mixin level and add the value to `amounts` multiple times.
 > Server must respond to each value in `amounts`, even if the value appears
-> multiple times.gi
+> multiple times.
 
 **Response** object
 
@@ -309,11 +319,12 @@ was actually spent.
 
 **Response** object
 
-|    Field   |        Type       |                Description              |
-|------------|-------------------|-----------------------------------------|
-| per_kb_fee | uint64            | Estimated network fee                   |
-| amount     | uint64-string     | The total value in outputs              |
-| outputs    | array of output's | Outputs possibly available for spending |
+|    Field     |        Type       |                Description              |
+|--------------|-------------------|-----------------------------------------|
+| per_byte_fee | uint64-string     | Estimated network fee                   |
+| fee_mask     | uint64-string     | Fee quantization mask                   |
+| amount       | uint64-string     | The total value in outputs              |
+| outputs      | array of output's | Outputs possibly available for spending |
 
 #### `import_request`
 Request an account scan from the genesis block.
@@ -358,7 +369,7 @@ Check for the existence of an account or create a new one.
 > error must be returned.
 
 > If approval process is manual, a successful HTTP 200 OK and response object
-> must be returned. Subsequent requests shall be HTTP 405 "Forbidden" until
+> must be returned. Subsequent requests shall be HTTP 403 "Forbidden" until
 > account is approved.
 
 **Response** object
