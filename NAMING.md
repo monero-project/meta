@@ -1,6 +1,8 @@
 # Monero Release Naming Convention
 
-Monero's naming convention of a chemical element, and celestial object, and was decided on via a discussion on the official forum in 2015 and after a community enthusiasm for Lithium Luna in 2018. Alliteration or assonance is also required, for maximum awesomeness. As an example, the first Monero release following this convention was named "Hydrogen Helix".
+Monero's naming convention of a chemical element (in sequence), and celestial object, and was decided on via a discussion on the official forum in 2015. Alliteration or assonance is also required, for maximum awesomeness. As an example, the first Monero release following this convention was named "Hydrogen Helix".
+
+Note that the only time a chemical element has been out of periodic table sequence was with the release of Wolfram Warptangent, so named in memory of warptangent after his passing, and in recognition of all of his early contributions to Monero.
 
 Below is a list of elements and galactic bodies, as prepared by palexander.
 
