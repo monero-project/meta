@@ -142,20 +142,20 @@ blockchain timestamps do not have sub-seconds.
 
 **transaction** object
 
-|     Field      |      Type       |        Description        |
-|----------------|-----------------|---------------------------|
-| id             | `uint64`        | Index of tx in blockchain |
-| hash           | `binary`        | Bytes of tx hash          |
-| timestamp *    | `timestamp`     | Timestamp of block        |
-| total_received | `uint64-string` | Total XMR received        |
-| total_sent     | `uint64-string` | XMR possibly being spent  |
-| unlock_time    | `uint64`        | Tx unlock time field      |
-| height *       | `uint64`        | Block height              |
-| spent_outputs  | array of spends | List of possible spends   |
-| payment_id *   | `binary`        | Bytes of tx payment id    |
-| coinbase       | `boolean`       | True if tx is coinbase    |
-| mempool        | `boolean`       | True if tx is in mempool  |
-| mixin          | `uint32`        | Mixin of the receive      |
+|     Field      |           Type           |        Description        |
+|----------------|--------------------------|---------------------------|
+| id             | `uint64`                 | Index of tx in blockchain |
+| hash           | `binary`                 | Bytes of tx hash          |
+| timestamp *    | `timestamp`              | Timestamp of block        |
+| total_received | `uint64-string`          | Total XMR received        |
+| total_sent     | `uint64-string`          | XMR possibly being spent  |
+| unlock_time    | `uint64`                 | Tx unlock time field      |
+| height *       | `uint64`                 | Block height              |
+| spent_outputs  | array of `spend` objects | List of possible spends   |
+| payment_id *   | `binary`                 | Bytes of tx payment id    |
+| coinbase       | `boolean`                | True if tx is coinbase    |
+| mempool        | `boolean`                | True if tx is in mempool  |
+| mixin          | `uint32`                 | Mixin of the receive      |
 
 > `id` is determined by the monero daemon. It is the offset that a
 > transaction appears in the blockchain from the genesis block.
@@ -200,10 +200,10 @@ exceed 2^53 - all numbers are 64-bit floats in JavaScript.
 
 Randomly selected outputs for use in a ring signature.
 
-|   Field   |           Type          |       Description       |
-|-----------|-------------------------|-------------------------|
-|  amount   |     `uint64-string`     | XMR amount, 0 if ringct |
-| outputs * | array of random_outputs | Selected outputs        |
+|   Field   |               Type               |       Description       |
+|-----------|----------------------------------|-------------------------|
+|  amount   | `uint64-string`                  | XMR amount, 0 if ringct |
+| outputs * | array of `random_output` objects | Selected outputs        |
 
 > `outputs` is omitted by the server if the `amount` does not have enough
 > mixable outputs.
@@ -226,18 +226,18 @@ list of candidate spends is returned.
 
 **Response** object
 
-|        Field         |      Type       |       Description         |
-|----------------------|-----------------|---------------------------|
-| locked_funds         | `uint64-string` | Sum of unspendable XMR    |
-| total_received       | `uint64-string` | Sum of received XMR       |
-| total_sent           | `uint64-string` | Sum of possibly spent XMR |
-| scanned_height       | `uint64`        | Current tx scan progress  |
-| scanned_block_height | `uint64`        | Current scan progress     |
-| start_height         | `uint64`        | Start height of response  |
-| transaction_height   | `uint64`        | Total txes sent in Monero |
-| blockchain_height    | `uint64`        | Current blockchain height |
-| spent_outputs        | array of spends | Possible spend info       |
-| rates *              | rates           | Current exchange rates    |
+|        Field         |          Type            |       Description         |
+|----------------------|--------------------------|---------------------------|
+| locked_funds         | `uint64-string`          | Sum of unspendable XMR    |
+| total_received       | `uint64-string`          | Sum of received XMR       |
+| total_sent           | `uint64-string`          | Sum of possibly spent XMR |
+| scanned_height       | `uint64`                 | Current tx scan progress  |
+| scanned_block_height | `uint64`                 | Current scan progress     |
+| start_height         | `uint64`                 | Start height of response  |
+| transaction_height   | `uint64`                 | Total txes sent in Monero |
+| blockchain_height    | `uint64`                 | Current blockchain height |
+| spent_outputs        | array of `spend` objects | Possible spend info       |
+| rates *              | `rates`                  | Current exchange rates    |
 
 > `rates` is omitted if unavailable.
 
@@ -258,14 +258,14 @@ spends is returned.
 
 **Response** object
 
-|        Field         |         Type          |       Description         |
-|----------------------|-----------------------|---------------------------|
-| total_received       | `uint64-string`       | Sum of received outputs   |
-| scanned_height       | `uint64`              | Current tx scan progress  |
-| scanned_block_height | `uint64`              | Current scan progress     |
-| start_height         | `uint64`              | Start height of response  |
-| blockchain_height    | `uint64`              | Current blockchain height |
-| transactions         | array of transactions | Possible spend info       |
+|        Field         |             Type               |       Description         |
+|----------------------|--------------------------------|---------------------------|
+| total_received       | `uint64-string`                | Sum of received outputs   |
+| scanned_height       | `uint64`                       | Current tx scan progress  |
+| scanned_block_height | `uint64`                       | Current scan progress     |
+| start_height         | `uint64`                       | Start height of response  |
+| blockchain_height    | `uint64`                       | Current blockchain height |
+| transactions         | array of `transaction` objects | Possible spend info       |
 
 #### `get_random_outs`
 Selects random outputs to use in a ring signature of a new transaction. If the
@@ -278,10 +278,10 @@ locally select outputs using a triangular distribution
 
 **Request** object
 
-|    Field   |            Type           |          Description             |
-|------------|---------------------------|----------------------------------|
-| count      | `uint32`                  | Mixin (name is historical)       |
-| amounts    | array of `uint64-strings` | XMR amounts that need mixing     |
+|    Field   |               Type               |          Description             |
+|------------|----------------------------------|----------------------------------|
+| count      | `uint32`                         | Mixin (name is historical)       |
+| amounts    | array of `uint64-string` objects | XMR amounts that need mixing     |
 
 > Clients must use amount `0` when computing a ringct output.
 
@@ -292,9 +292,9 @@ locally select outputs using a triangular distribution
 
 **Response** object
 
-|    Field    |           Type          |          Description             |
-|-------------|-------------------------|----------------------------------|
-| amount_outs | array of random_outputs | Dummy outputs for each `amounts` |
+|    Field    |               Type               |          Description             |
+|-------------|----------------------------------|----------------------------------|
+| amount_outs | array of `random_output` objects | Dummy outputs for each `amounts` |
 
 > If there are not enough outputs to mix for a specific amount, the server
 > shall omit the `outputs` field in `amount_outs`.
@@ -319,22 +319,22 @@ was actually spent.
 
 **Response** object
 
-|    Field     |       Type       |                Description              |
-|--------------|------------------|-----------------------------------------|
-| per_byte_fee | `uint64-string`  | Estimated network fee                   |
-| fee_mask     | `uint64-string`  | Fee quantization mask                   |
-| amount       | `uint64-string`  | The total value in outputs              |
-| outputs      | array of outputs | Outputs possibly available for spending |
+|    Field     |           Type            |                Description              |
+|--------------|---------------------------|-----------------------------------------|
+| per_byte_fee | `uint64-string`           | Estimated network fee                   |
+| fee_mask     | `uint64-string`           | Fee quantization mask                   |
+| amount       | `uint64-string`           | The total value in outputs              |
+| outputs      | array of `output` objects | Outputs possibly available for spending |
 
 #### `import_request`
 Request an account scan from the genesis block.
 
 **Request** object
 
-|   Field  |      Type      |      Description        |
-|----------|----------------|-------------------------|
-| address  | base58-address | Address to create/probe |
-| view_key | binary         | View key bytes          |
+|   Field  |       Type       |      Description        |
+|----------|------------------|-------------------------|
+| address  | `base58-address` | Address to create/probe |
+| view_key | `binary`         | View key bytes          |
 
 **Response** object
 
