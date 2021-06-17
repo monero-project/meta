@@ -57,20 +57,20 @@ A standard Monero public address encoded as a string in JSON.
 
 Information needed to spend an output.
 
-|       Field      |        Type       |          Description          |
-|------------------|-------------------|-------------------------------|
-| tx_id            | uint64            | Index of tx in blockchain     |
-| amount           | uint64-string     | XMR value of output           |
-| index            | uint16            | Index within vout vector      |
-| global_index     | uint64-string     | Index within amount           |
-| rct              | binary            | Bytes of ringct data          |
-| tx_hash          | binary            | Bytes of tx hash              |
-| tx_prefix_hash   | binary            | Bytes of tx prefix hash       |
-| public_key       | binary            | Bytes of output public key    |
-| tx_pub_key       | binary            | Bytes of the tx public key    |
-| spend_key_images | array of binary's | Bytes of key images           |
-| timestamp        | timestamp         | Timestamp of containing block |
-| height           | uint64            | Containing block height       |
+|       Field      |           Type            |          Description          |
+|------------------|---------------------------|-------------------------------|
+| tx_id            | `uint64`                  | Index of tx in blockchain     |
+| amount           | `uint64-string`           | XMR value of output           |
+| index            | `uint16`                  | Index within vout vector      |
+| global_index     | `uint64-string`           | Index within amount           |
+| rct              | `binary`                  | Bytes of ringct data          |
+| tx_hash          | `binary`                  | Bytes of tx hash              |
+| tx_prefix_hash   | `binary`                  | Bytes of tx prefix hash       |
+| public_key       | `binary`                  | Bytes of output public key    |
+| tx_pub_key       | `binary`                  | Bytes of the tx public key    |
+| spend_key_images | array of `binary` objects | Bytes of key images           |
+| timestamp        | `timestamp`               | Timestamp of containing block |
+| height           | `uint64`                  | Containing block height       |
 
 > `tx_id` is determined by the monero daemon. It is the offset that a
 > transaction appears in the blockchain from the genesis block.
@@ -92,42 +92,42 @@ Information needed to spend an output.
 
 **rates** object
 
-| Field |  Type   |      Description      |
-|-------|---------|-----------------------|
-| AUD * | float32 | AUD/XMR exchange rate |
-| BRL * | float32 | BRL/XMR exchange rate |
-| BTC * | float32 | BTC/XMR exchange rate |
-| CAD * | float32 | CAD/XMR exchange rate |
-| CHF * | float32 | CHF/XMR exchange rate |
-| CNY * | float32 | CNY/XMR exchange rate |
-| EUR * | float32 | EUR/XMR exchange rate |
-| GBP * | float32 | GBP/XMR exchange rate |
-| HKD * | float32 | HKD/XMR exchange rate |
-| INR * | float32 | INR/XMR exchange rate |
-| JPY * | float32 | JPY/XMR exchange rate |
-| KRW * | float32 | KRW/XMR exhcnage rate |
-| MXN * | float32 | MXN/XMR exchange rate |
-| NOK * | float32 | NOK/XMR exchange rate |
-| NZD * | float32 | NZD/XMR exchange rate |
-| SEK * | float32 | SEK/XMR exchange rate |
-| SGD * | float32 | SGD/XMR exchange rate |
-| TRY * | float32 | TRY/XMR exchange rate |
-| USD * | float32 | USD/XMR exchange rate |
-| RUB * | float32 | RUB/XMR exchange rate |
-| ZAR * | float32 | ZAR/XMR exchange rate |
+| Field |   Type    |      Description      |
+|-------|-----------|-----------------------|
+| AUD * | `float32` | AUD/XMR exchange rate |
+| BRL * | `float32` | BRL/XMR exchange rate |
+| BTC * | `float32` | BTC/XMR exchange rate |
+| CAD * | `float32` | CAD/XMR exchange rate |
+| CHF * | `float32` | CHF/XMR exchange rate |
+| CNY * | `float32` | CNY/XMR exchange rate |
+| EUR * | `float32` | EUR/XMR exchange rate |
+| GBP * | `float32` | GBP/XMR exchange rate |
+| HKD * | `float32` | HKD/XMR exchange rate |
+| INR * | `float32` | INR/XMR exchange rate |
+| JPY * | `float32` | JPY/XMR exchange rate |
+| KRW * | `float32` | KRW/XMR exhcnage rate |
+| MXN * | `float32` | MXN/XMR exchange rate |
+| NOK * | `float32` | NOK/XMR exchange rate |
+| NZD * | `float32` | NZD/XMR exchange rate |
+| SEK * | `float32` | SEK/XMR exchange rate |
+| SGD * | `float32` | SGD/XMR exchange rate |
+| TRY * | `float32` | TRY/XMR exchange rate |
+| USD * | `float32` | USD/XMR exchange rate |
+| RUB * | `float32` | RUB/XMR exchange rate |
+| ZAR * | `float32` | ZAR/XMR exchange rate |
 
 > If an exchange rate is unavailable, the server field shall omit the field
 > from the JSON object.
 
 **spend** object
 
-|    Field   |      Type     |       Description          |
-|------------|---------------|----------------------------|
-| amount     | uint64-string | XMR possibly being spent   |
-| key_image  | binary        | Bytes of the key image     |
-| tx_pub_key | binary        | Bytes of the tx public key |
-| out_index  | uint16        | Index of source output     |
-| mixin      | uint32        | Mixin of the spend         |
+|    Field   |       Type      |       Description          |
+|------------|-----------------|----------------------------|
+| amount     | `uint64-string` | XMR possibly being spent   |
+| key_image  | `binary`        | Bytes of the key image     |
+| tx_pub_key | `binary`        | Bytes of the tx public key |
+| out_index  | `uint16`        | Index of source output     |
+| mixin      | `uint32`        | Mixin of the spend         |
 
 > `out_index` is a zero-based offset from the original received output. The
 > variable within the monero codebase is the `vout` array, this is the index
@@ -142,20 +142,20 @@ blockchain timestamps do not have sub-seconds.
 
 **transaction** object
 
-|     Field      |       Type       |        Description        |
-|----------------|------------------|---------------------------|
-| id             | uint64           | Index of tx in blockchain |
-| hash           | binary           | Bytes of tx hash          |
-| timestamp *    | timestamp        | Timestamp of block        |
-| total_received | uint64-string    | Total XMR received        |
-| total_sent     | uint64-string    | XMR possibly being spent  |
-| unlock_time    | uint64           | Tx unlock time field      |
-| height *       | uint64           | Block height              |
-| spent_outputs  | array of spend's | List of possible spends   |
-| payment_id *   | binary           | Bytes of tx payment id    |
-| coinbase       | boolean          | True if tx is coinbase    |
-| mempool        | boolean          | True if tx is in mempool  |
-| mixin          | uint32           | Mixin of the receive      |
+|     Field      |           Type           |        Description        |
+|----------------|--------------------------|---------------------------|
+| id             | `uint64`                 | Index of tx in blockchain |
+| hash           | `binary`                 | Bytes of tx hash          |
+| timestamp *    | `timestamp`              | Timestamp of block        |
+| total_received | `uint64-string`          | Total XMR received        |
+| total_sent     | `uint64-string`          | XMR possibly being spent  |
+| unlock_time    | `uint64`                 | Tx unlock time field      |
+| height *       | `uint64`                 | Block height              |
+| spent_outputs  | array of `spend` objects | List of possible spends   |
+| payment_id *   | `binary`                 | Bytes of tx payment id    |
+| coinbase       | `boolean`                | True if tx is coinbase    |
+| mempool        | `boolean`                | True if tx is in mempool  |
+| mixin          | `uint32`                 | Mixin of the receive      |
 
 > `id` is determined by the monero daemon. It is the offset that a
 > transaction appears in the blockchain from the genesis block.
@@ -186,11 +186,11 @@ exceed 2^53 - all numbers are 64-bit floats in JavaScript.
 
 **random_output** object
 
-|     Field    |      Type     |            Description             |
-|--------------|---------------|------------------------------------|
-| global_index | uint64-string | Index within amount                |
-| public_key   | bytes         | Bytes of output public key         |
-| rct          | bytes         | Bytes containing ringct commitment |
+|     Field    |       Type      |            Description             |
+|--------------|-----------------|------------------------------------|
+| global_index | `uint64-string` | Index within amount                |
+| public_key   | `bytes`         | Bytes of output public key         |
+| rct          | `bytes`         | Bytes containing ringct commitment |
 
 > `global_index` is determined by the monero daemon. It is the offset from the
 > first time the amount appeared in the blockchain. After ringct, this is the
@@ -200,10 +200,10 @@ exceed 2^53 - all numbers are 64-bit floats in JavaScript.
 
 Randomly selected outputs for use in a ring signature.
 
-|   Field   |            Type          |       Description       |
-|-----------|--------------------------|-------------------------|
-|  amount   |       uint64-string      | XMR amount, 0 if ringct |
-| outputs * | array of random_output's | Selected outputs        |
+|   Field   |               Type               |       Description       |
+|-----------|----------------------------------|-------------------------|
+|  amount   | `uint64-string`                  | XMR amount, 0 if ringct |
+| outputs * | array of `random_output` objects | Selected outputs        |
 
 > `outputs` is omitted by the server if the `amount` does not have enough
 > mixable outputs.
@@ -216,28 +216,28 @@ list of candidate spends is returned.
 
 **Request** object
 
-|   Field   |      Type      |            Description                |
-|-----------|----------------|---------------------------------------|
-| address   | base58-address | Address to retrieve                   |
-| view_key  | binary         | View key bytes for authorization      |
+|   Field   |       Type       |            Description                |
+|-----------|------------------|---------------------------------------|
+| address   | `base58-address` | Address to retrieve                   |
+| view_key  | `binary`         | View key bytes for authorization      |
 
 > If `address` is not authorized, the server must return a HTTP 403
 > "Forbidden" error.
 
 **Response** object
 
-|        Field         |       Type       |       Description         |
-|----------------------|------------------|---------------------------|
-| locked_funds         | uint64-string    | Sum of unspendable XMR    |
-| total_received       | uint64-string    | Sum of received XMR       |
-| total_sent           | uint64-string    | Sum of possibly spent XMR |
-| scanned_height       | uint64           | Current tx scan progress  |
-| scanned_block_height | uint64           | Current scan progress     |
-| start_height         | uint64           | Start height of response  |
-| transaction_height   | uint64           | Total txes sent in Monero |
-| blockchain_height    | uint64           | Current blockchain height |
-| spent_outputs        | array of spend's | Possible spend info       |
-| rates *              | rates            | Current exchange rates    |
+|        Field         |          Type            |       Description         |
+|----------------------|--------------------------|---------------------------|
+| locked_funds         | `uint64-string`          | Sum of unspendable XMR    |
+| total_received       | `uint64-string`          | Sum of received XMR       |
+| total_sent           | `uint64-string`          | Sum of possibly spent XMR |
+| scanned_height       | `uint64`                 | Current tx scan progress  |
+| scanned_block_height | `uint64`                 | Current scan progress     |
+| start_height         | `uint64`                 | Start height of response  |
+| transaction_height   | `uint64`                 | Total txes sent in Monero |
+| blockchain_height    | `uint64`                 | Current blockchain height |
+| spent_outputs        | array of `spend` objects | Possible spend info       |
+| rates *              | `rates`                  | Current exchange rates    |
 
 > `rates` is omitted if unavailable.
 
@@ -248,24 +248,24 @@ spends is returned.
 
 **Request** object
 
-|   Field  |       Type     |             Description               |
-|----------|----------------|---------------------------------------|
-| address  | base58-address | Address to retrieve                   |
-| view_key | binary         | View key bytes for authorization      |
+|   Field  |        Type      |             Description               |
+|----------|------------------|---------------------------------------|
+| address  | `base58-address` | Address to retrieve                   |
+| view_key | `binary`         | View key bytes for authorization      |
 
 > If `address` is not authorized, the server must return a HTTP 403
 > "Forbidden" error.
 
 **Response** object
 
-|        Field         |          Type          |       Description         |
-|----------------------|------------------------|---------------------------|
-| total_received       | uint64-string          | Sum of received outputs   |
-| scanned_height       | uint64                 | Current tx scan progress  |
-| scanned_block_height | uint64                 | Current scan progress     |
-| start_height         | uint64                 | Start height of response  |
-| blockchain_height    | uint64                 | Current blockchain height |
-| transactions         | array of transaction's | Possible spend info       |
+|        Field         |             Type               |       Description         |
+|----------------------|--------------------------------|---------------------------|
+| total_received       | `uint64-string`                | Sum of received outputs   |
+| scanned_height       | `uint64`                       | Current tx scan progress  |
+| scanned_block_height | `uint64`                       | Current scan progress     |
+| start_height         | `uint64`                       | Start height of response  |
+| blockchain_height    | `uint64`                       | Current blockchain height |
+| transactions         | array of `transaction` objects | Possible spend info       |
 
 #### `get_random_outs`
 Selects random outputs to use in a ring signature of a new transaction. If the
@@ -278,10 +278,10 @@ locally select outputs using a triangular distribution
 
 **Request** object
 
-|    Field   |            Type           |          Description             |
-|------------|---------------------------|----------------------------------|
-| count      | uint32                    | Mixin (name is historical)       |
-| amounts    | array of uint64-strings's | XMR amounts that need mixing     |
+|    Field   |               Type               |          Description             |
+|------------|----------------------------------|----------------------------------|
+| count      | `uint32`                         | Mixin (name is historical)       |
+| amounts    | array of `uint64-string` objects | XMR amounts that need mixing     |
 
 > Clients must use amount `0` when computing a ringct output.
 
@@ -292,9 +292,9 @@ locally select outputs using a triangular distribution
 
 **Response** object
 
-|    Field    |           Type           |          Description             |
-|-------------|--------------------------|----------------------------------|
-| amount_outs | array of random_outputs' | Dummy outputs for each `amounts` |
+|    Field    |               Type               |          Description             |
+|-------------|----------------------------------|----------------------------------|
+| amount_outs | array of `random_output` objects | Dummy outputs for each `amounts` |
 
 > If there are not enough outputs to mix for a specific amount, the server
 > shall omit the `outputs` field in `amount_outs`.
@@ -305,47 +305,47 @@ was actually spent.
 
 **Request** object
 
-|       Field      |      Type      |           Description            |
-|------------------|----------------|----------------------------------|
-| address          | base58-address | Address to create/probe          |
-| view_key         | binary         | View key bytes                   |
-| amount           | uint64-string  | XMR send amount                  |
-| mixin            | uint32         | Minimum mixin for source output  |
-| use_dust         | boolean        | Return all available outputs     |
-| dust_threshold * | uint64-string  | Ignore outputs below this amount |
+|       Field      |       Type       |           Description            |
+|------------------|------------------|----------------------------------|
+| address          | `base58-address` | Address to create/probe          |
+| view_key         | `binary`         | View key bytes                   |
+| amount           | `uint64-string`  | XMR send amount                  |
+| mixin            | `uint32`         | Minimum mixin for source output  |
+| use_dust         | `boolean`        | Return all available outputs     |
+| dust_threshold * | `uint64-string`  | Ignore outputs below this amount |
 
 > If the total received outputs for the address is less than `amount`, the
 > server shall return a HTTP 400 "Bad Request" error code.
 
 **Response** object
 
-|    Field     |        Type       |                Description              |
-|--------------|-------------------|-----------------------------------------|
-| per_byte_fee | uint64-string     | Estimated network fee                   |
-| fee_mask     | uint64-string     | Fee quantization mask                   |
-| amount       | uint64-string     | The total value in outputs              |
-| outputs      | array of output's | Outputs possibly available for spending |
+|    Field     |           Type            |                Description              |
+|--------------|---------------------------|-----------------------------------------|
+| per_byte_fee | `uint64-string`           | Estimated network fee                   |
+| fee_mask     | `uint64-string`           | Fee quantization mask                   |
+| amount       | `uint64-string`           | The total value in outputs              |
+| outputs      | array of `output` objects | Outputs possibly available for spending |
 
 #### `import_request`
 Request an account scan from the genesis block.
 
 **Request** object
 
-|   Field  |      Type      |      Description        |
-|----------|----------------|-------------------------|
-| address  | base58-address | Address to create/probe |
-| view_key | binary         | View key bytes          |
+|   Field  |       Type       |      Description        |
+|----------|------------------|-------------------------|
+| address  | `base58-address` | Address to create/probe |
+| view_key | `binary`         | View key bytes          |
 
 **Response** object
 
-|       Field        |      Type      |           Description            |
-|--------------------|----------------|----------------------------------|
-| payment_address *  | base58-address | Payment location                 |
-| payment_id *       | binary         | Bytes for payment_id tx field    |
-| import_fee *       | uint64-string  | Fee required to complete request |
-| new_request        | boolean        | New or existing request          |
-| request_fulfilled  | boolean        | Indicates success                |
-| status             | string         | Custom message                   |
+|       Field        |       Type       |           Description            |
+|--------------------|------------------|----------------------------------|
+| payment_address *  | `base58-address` | Payment location                 |
+| payment_id *       | `binary`         | Bytes for payment_id tx field    |
+| import_fee *       | `uint64-string`  | Fee required to complete request |
+| new_request        | `boolean`        | New or existing request          |
+| request_fulfilled  | `boolean`        | Indicates success                |
+| status             | `string`         | Custom message                   |
 
 > `payment_id`, `import_fee`, and `payment_address` may be omitted if the
 > client does not need to send XMR to complete the request.
@@ -355,12 +355,12 @@ Check for the existence of an account or create a new one.
 
 **Request** object
 
-|       Field       |      Type      |           Description            |
-|-------------------|----------------|----------------------------------|
-| address           | base58-address | Address to create/probe          |
-| view_key          | binary         | View key bytes                   |
-| create_account    | boolean        | Try to create new account        |
-| generated_locally | boolean        | Indicate that the address is new |
+|       Field       |       Type       |           Description            |
+|-------------------|------------------|----------------------------------|
+| address           | `base58-address` | Address to create/probe          |
+| view_key          | `binary`         | View key bytes                   |
+| create_account    | `boolean`        | Try to create new account        |
+| generated_locally | `boolean`        | Indicate that the address is new |
 
 > The view key bytes are required even if an account is not being created, to
 > prevent metadata leakage.
@@ -374,29 +374,29 @@ Check for the existence of an account or create a new one.
 
 **Response** object
 
-|        Field        |  Type   |            Description             |
-|---------------------|---------|------------------------------------|
-| new_address         | boolean | Whether account was just created   |
-| generated_locally * | boolean | Flag from initial account creation |
-| start_height *      | uint64  | Account scanning start block       |
+|        Field        |   Type    |            Description             |
+|---------------------|-----------|------------------------------------|
+| new_address         | `boolean` | Whether account was just created   |
+| generated_locally * | `boolean` | Flag from initial account creation |
+| start_height *      | `uint64`  | Account scanning start block       |
 
 #### `submit_raw_tx`
 Submit raw transaction to be relayed to monero network.
 
 **Request** object
 
-|    Field   |      Type      |                     Description                           |
-|------------|----------------|-----------------------------------------------------------|
-| tx         | binary         | Raw transaction bytes, in format used by daemon p2p comms |
+| Field |   Type   |                     Description                           |
+|-------|----------|-----------------------------------------------------------|
+| tx    | `binary` | Raw transaction bytes, in format used by daemon p2p comms |
 
 > This format is tricky unfortunately, it is custom to the monero daemon. The
 > internal code of `monerod` must be read to determine this format currently.
 
 **Response** object
 
-| Field  |  Type  |   Description   |
-|--------|--------|-----------------|
-| status | string | Status of relay |
+| Field  |   Type   |   Description   |
+|--------|----------|-----------------|
+| status | `string` | Status of relay |
 
 > `status` is typically the response by the monero daemon attempting to relay
 > the transaction.
