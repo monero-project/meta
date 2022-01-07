@@ -51,7 +51,15 @@ concept - a public key or hash.
 
 **base58-address**
 
-A standard Monero public address encoded as a string in JSON.
+A Monero public address encoded as a string in JSON.
+
+**address_meta** object
+
+|     Field     |       Type       |       Description      |
+|---------------|------------------|------------------------|
+| `address`     | `base58-address` | Monero public address  |
+| `major_index` | `uint32`         | Subaddress major index |
+| `minor_index` | `uint32`         | Subaddress minor index |
 
 **output** object
 
@@ -71,6 +79,7 @@ Information needed to spend an output.
 | spend_key_images | array of `binary` objects | Bytes of key images           |
 | timestamp        | `timestamp`               | Timestamp of containing block |
 | height           | `uint64`                  | Containing block height       |
+| recipient        | `address_meta` object     | Address data of the recipient |
 
 > `tx_id` is determined by the monero daemon. It is the offset that a
 > transaction appears in the blockchain from the genesis block.
@@ -121,13 +130,14 @@ Information needed to spend an output.
 
 **spend** object
 
-|    Field   |       Type      |       Description          |
-|------------|-----------------|----------------------------|
-| amount     | `uint64-string` | XMR possibly being spent   |
-| key_image  | `binary`        | Bytes of the key image     |
-| tx_pub_key | `binary`        | Bytes of the tx public key |
-| out_index  | `uint16`        | Index of source output     |
-| mixin      | `uint32`        | Mixin of the spend         |
+|    Field   |          Type         |        Description         |
+|------------|-----------------------|----------------------------|
+| amount     | `uint64-string`       | XMR possibly being spent   |
+| key_image  | `binary`              | Bytes of the key image     |
+| tx_pub_key | `binary`              | Bytes of the tx public key |
+| out_index  | `uint16`              | Index of source output     |
+| mixin      | `uint32`              | Mixin of the spend         |
+| sender     | `address_meta` object | Address data of the sender |
 
 > `out_index` is a zero-based offset from the original received output. The
 > variable within the monero codebase is the `vout` array, this is the index
@@ -210,19 +220,22 @@ Randomly selected outputs for use in a ring signature.
 
 ### Methods
 #### `get_address_info`
-Returns the minimal set of information needed to calculate a wallet balance.
-The server cannot calculate when a spend occurs without the spend key, so a
-list of candidate spends is returned.
+Returns the minimal set of information needed to calculate a wallet balance,
+including the balance of subaddresses. The server cannot calculate when a spend
+occurs without the spend key, so a list of candidate spends is returned.
 
 **Request** object
 
 |   Field   |       Type       |            Description                |
 |-----------|------------------|---------------------------------------|
-| address   | `base58-address` | Address to retrieve                   |
+| address   | `base58-address` | Standard address of the wallet        |
 | view_key  | `binary`         | View key bytes for authorization      |
 
 > If `address` is not authorized, the server must return a HTTP 403
 > "Forbidden" error.
+
+> If `address` is not a standard address, the server must return a HTTP 400
+> "Bad Request" error.
 
 **Response** object
 
@@ -244,17 +257,21 @@ list of candidate spends is returned.
 #### `get_address_txs`
 Returns information needed to show transaction history. The server cannot
 calculate when a spend occurs without the spend key, so a list of candidate
-spends is returned.
+spends is returned. The response should show a wallet's entire history,
+including transactions to and from subaddresses.
 
 **Request** object
 
 |   Field  |        Type      |             Description               |
 |----------|------------------|---------------------------------------|
-| address  | `base58-address` | Address to retrieve                   |
+| address  | `base58-address` | Standard address of the wallet        |
 | view_key | `binary`         | View key bytes for authorization      |
 
 > If `address` is not authorized, the server must return a HTTP 403
 > "Forbidden" error.
+
+> If `address` is not a standard address, the server must return a HTTP 400
+> "Bad Request" error.
 
 **Response** object
 
@@ -300,14 +317,14 @@ locally select outputs using a triangular distribution
 > shall omit the `outputs` field in `amount_outs`.
 
 #### `get_unspent_outs`
-Returns a list of received outputs. The client must determine when the output
-was actually spent.
+Returns a list of received outputs to the wallet, including to subaddresses.
+The client must determine when the output was actually spent.
 
 **Request** object
 
 |       Field      |       Type       |           Description            |
 |------------------|------------------|----------------------------------|
-| address          | `base58-address` | Address to create/probe          |
+| address          | `base58-address` | Standard address of the wallet   |
 | view_key         | `binary`         | View key bytes                   |
 | amount           | `uint64-string`  | XMR send amount                  |
 | mixin            | `uint32`         | Minimum mixin for source output  |
@@ -316,6 +333,9 @@ was actually spent.
 
 > If the total received outputs for the address is less than `amount`, the
 > server shall return a HTTP 400 "Bad Request" error code.
+
+> If `address` is not a standard address, the server must return a HTTP 400
+> "Bad Request" error.
 
 **Response** object
 
@@ -331,10 +351,10 @@ Request an account scan from the genesis block.
 
 **Request** object
 
-|   Field  |       Type       |      Description        |
-|----------|------------------|-------------------------|
-| address  | `base58-address` | Address to create/probe |
-| view_key | `binary`         | View key bytes          |
+|   Field  |       Type       |            Description         |
+|----------|------------------|--------------------------------|
+| address  | `base58-address` | Standard address of the wallet |
+| view_key | `binary`         | View key bytes                 |
 
 **Response** object
 
@@ -350,6 +370,9 @@ Request an account scan from the genesis block.
 > `payment_id`, `import_fee`, and `payment_address` may be omitted if the
 > client does not need to send XMR to complete the request.
 
+> If `address` is not a standard address, the server must return a HTTP 400
+> "Bad Request" error.
+
 #### `login`
 Check for the existence of an account or create a new one.
 
@@ -357,7 +380,7 @@ Check for the existence of an account or create a new one.
 
 |       Field       |       Type       |           Description            |
 |-------------------|------------------|----------------------------------|
-| address           | `base58-address` | Address to create/probe          |
+| address           | `base58-address` | Standard address of the wallet   |
 | view_key          | `binary`         | View key bytes                   |
 | create_account    | `boolean`        | Try to create new account        |
 | generated_locally | `boolean`        | Indicate that the address is new |
@@ -371,6 +394,9 @@ Check for the existence of an account or create a new one.
 > If approval process is manual, a successful HTTP 200 OK and response object
 > must be returned. Subsequent requests shall be HTTP 403 "Forbidden" until
 > account is approved.
+
+> If `address` is not a standard address, the server must return a HTTP 400
+> "Bad Request" error.
 
 **Response** object
 
