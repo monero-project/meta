@@ -55,11 +55,10 @@ A Monero public address encoded as a string in JSON.
 
 **address_meta** object
 
-|     Field     |       Type       |       Description      |
-|---------------|------------------|------------------------|
-| `address`     | `base58-address` | Monero public address  |
-| `major_index` | `uint32`         | Subaddress major index |
-| `minor_index` | `uint32`         | Subaddress minor index |
+| Field |   Type   |      Description       |
+|-------|----------|------------------------|
+| maj_i | `uint32` | Subaddress major index |
+| min_i | `uint32` | Subaddress minor index |
 
 **output** object
 
@@ -217,6 +216,26 @@ Randomly selected outputs for use in a ring signature.
 
 > `outputs` is omitted by the server if the `amount` does not have enough
 > mixable outputs.
+
+**index_range** array
+
+An array of fixed size 2, denoting an inclusive range. The first element is the
+inclusive lower bound of the range. The second element is the inclusive upper
+bound of the range. The second element is greater than or equal to the first
+element. Both elements are of type `uint32`. Example: `[3,5]`.
+
+**subaddrs** dictionary
+
+Keys are the major index of Monero subaddresses, values are the minor indexes
+of subaddresses within that major index.
+
+|       |             Type              |                Description              |
+|-------|-------------------------------|-----------------------------------------|
+| Key   | `uint32-string`               | Subaddress major index                  |
+| Value | array of `index_range` arrays | Minor subaddresses within the the major |
+
+> Minor subaddresses are in strictly increasing order with no overlapping
+> bounds. For example, they can be `[[0,3],[5,9]]`, but not `[[0,3],[2,6]]`.
 
 ### Methods
 #### `get_address_info`
@@ -426,3 +445,95 @@ Submit raw transaction to be relayed to monero network.
 
 > `status` is typically the response by the monero daemon attempting to relay
 > the transaction.
+
+#### `provision_subaddrs`
+Provision subaddresses at specified indexes. No two clients should ever receive
+the same newly provisioned subaddresses when calling this endpoint; the server
+should guarantee that newly provisioned subaddresses are fresh.
+
+**Request** object
+
+|   Field   |       Type       |                   Description                   |
+|-----------|------------------|-------------------------------------------------|
+| address   | `base58-address` | Standard address of the wallet                  |
+| view_key  | `binary`         | View key bytes                                  |
+| maj_i *   | `uint32`         | Subaddress major index (defaults to 0)          |
+| min_i *   | `uint32`         | Subaddress minor index (defaults to 0)          |
+| n_maj *   | `uint32`         | Number of major subaddresses to provision       |
+| n_min *   | `uint32`         | Number of minor subaddresses to provision       |
+| get_all * | `boolean`        | Whether to include all subaddresses in response |
+
+> The various combinations of `maj_i`, `min_i`, `n_maj`, and `n_min` behave
+> differently, but generally the server provisions subaddresses where it has not
+> already provisioned them, with the indexes specified as lower bounds.
+
+> If, for example, only `maj_i` is included, then the server should provision a
+> default number of minor subaddresses (e.g. 500) within that `maj_i`, wherever
+> minor subaddresses have not already been provisioned, starting with `min_i`
+> set to 0 as the lower bound.
+
+> If, for example, `maj_i`, `min_i`, `n_maj` and `n_min` are included, then the
+> server should provision `n_maj` majors wherever major subaddresses have not
+> already been provisioned starting with `maj_i` as the lower bound, and for
+> each major, provision `n_min` subaddresses starting with `min_i` as the lower
+> bound.
+
+> All combinations follow the above framework.
+
+> The server can choose to "pad" counts and provision *more* than a client
+> requests.
+
+> If the server cannot provision a specified number of subaddresses because the
+> server would provision more than the maximum number of subaddresses, HTTP 409
+> should be returned. Ack that the status code is not perfect here. In this
+> case, the client should make a new request either with a smaller requested
+> number of subaddresses to provision, or at a different major or minor index.
+
+> If none of `maj_i`, `min_i`, `n_maj`, and `n_min` are included in the request,
+> the server must return a HTTP 400 "Bad Request" error.
+
+> `get_all` defaults to true if not included in the request.
+
+**Response** object
+
+|     Field      |    Type    |                          Description                        |
+|----------------|------------|-------------------------------------------------------------|
+| new_subaddrs   | `subaddrs` | All new subaddresses provisioned in the request             |
+| all_subaddrs * | `subaddrs` | All subaddresses provisioned for the wallet (including new) |
+
+#### `upsert_subaddrs`
+Upsert subaddresses at the specified major and minor indexes. This endpoint is
+idempotent.
+
+**Request** object
+
+|   Field   |       Type       |                  Description                    |
+|-----------|------------------|-------------------------------------------------|
+| address   | `base58-address` | Standard address of the wallet                  |
+| view_key  | `binary`         | View key bytes                                  |
+| subaddrs  | `subaddrs`       | Subaddresses to upsert                          |
+| get_all * | `boolean`        | Whether to include all subaddresses in response |
+
+**Response** object
+
+|     Field      |    Type    |                          Description                        |
+|----------------|------------|-------------------------------------------------------------|
+| new_subaddrs   | `subaddrs` | All new subaddresses inserted in the request                |
+| all_subaddrs * | `subaddrs` | All subaddresses provisioned for the wallet (including new) |
+
+#### `get_subaddrs`
+
+Returns all subaddresses provisioned for a wallet.
+
+**Request** object
+
+|  Field   |       Type       |          Description           |
+|----------|------------------|--------------------------------|
+| address  | `base58-address` | Standard address of the wallet |
+| view_key | `binary`         | View key bytes                 |
+
+**Response** object
+
+|     Field    |    Type    |                Description                  |
+|--------------|------------|---------------------------------------------|
+| all_subaddrs | `subaddrs` | All subaddresses provisioned for the wallet |
