@@ -231,7 +231,7 @@ of subaddresses within that major index.
 
 |       |             Type              |                Description              |
 |-------|-------------------------------|-----------------------------------------|
-| Key   | `uint32-string`               | Subaddress major index                  |
+| Key   | `uint32`                      | Subaddress major index                  |
 | Value | array of `index_range` arrays | Minor subaddresses within the the major |
 
 > Minor subaddresses are in strictly increasing order with no overlapping
