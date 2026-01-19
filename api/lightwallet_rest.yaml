@@ -1,0 +1,1205 @@
+openapi: 3.0.4
+info:
+  title: Monero Light-Wallet-Server (LWS) API
+  description: |-
+    This document describes a reference standard specification for the Monero lightwallet server/client API. It’s implemented by OpenMonero, MyMonero, and the official Monero project, and is maintained with the purpose of organizing and recording the consensus of Monero lightwallet API projects, and to support alternate implementations.
+
+    Modifications to this specification should only be made with consensus of the projects which participate by implementing the specification.
+  version: 2.0.0
+externalDocs:
+  description: A markdown file, if more readable
+  url: https://github.com/monero-project/meta/blob/master/api/lightwallet_rest.md
+tags:
+  - name: account
+  - name: subaddress
+  - name: transaction
+paths:
+  /get_address_info:
+    post:
+      tags:
+        - transaction
+      summary: Calculate account balance
+      description: |
+        Returns the minimal set of information needed to calculate a wallet balance, including the balance of subaddresses. The server cannot calculate when a spend occurs without the spend key, so a list of candidate spends is returned.
+      operationId: get_address_info
+      requestBody:
+        description: Provide `view_key`/`address` pair
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/login'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  locked_funds:
+                    #description: Sum of unspendable XMR
+                    $ref: '#/components/schemas/uint64-string'
+                  total_received:
+                    #description: Sum of received XMR
+                    $ref: '#/components/schemas/uint64-string'
+                  total_sent:
+                    description: Sum of possibly spent XMR
+                    allOf:
+                      - $ref: '#/components/schemas/uint64-string'
+                  scanned_height:
+                    description: Current tx (tx_id) scan progress
+                    allOf:
+                      - $ref: '#/components/schemas/uint64'
+                  scanned_block_height:
+                    description: Current block scan progress
+                    allOf:
+                      - $ref: '#/components/schemas/uint64'
+                  start_height:
+                    #description: Start height of response
+                    $ref: '#/components/schemas/uint64'
+                  transaction_height:
+                    description: Total transactions sent in Monero
+                    allOf:
+                      - $ref: '#/components/schemas/uint64'
+                  blockchain_height:
+                    #description: Current blockchain height
+                    $ref: '#/components/schemas/uint64'
+                  spent_outputs:
+                    description: Possible spend info
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/spend'
+                  lookahead:
+                    description: The lookahead state, or {0, 0} if not provided
+                    allOf:
+                      - $ref: '#/components/schemas/address_meta'
+                  lookahead_failure:
+                    description: If provided, the block number subaddress lookahead failed
+                    allOf:
+                      - $ref: '#/components/schemas/uint64'
+                  rates:
+                    $ref: '#/components/schemas/rates'
+                required:
+                  - locked_funds
+                  - total_received
+                  - total_sent
+                  - scanned_height
+                  - scanned_block_height
+                  - start_height
+                  - transaction_height
+                  - blockchain_height
+                  - spent_outputs
+        '400':
+          description: Invalid JSON, or invalid base58 address.
+        '403':
+          description: Account is disabled, or does not exist.
+        '405':
+          description: Not `POST` method.
+        '500':
+          description: Invalid JSON schema, and all other general errors.
+        '503':
+          description: Unable to read from database.
+  /get_address_txs:
+    post:
+      tags:
+        - transaction
+      summary: Get transaction history
+      description: |
+        Returns information needed to show transaction history. The server cannot calculate when a spend occurs without the spend key, so a list of candidate spends is returned.
+      operationId: get_address_txs
+      requestBody:
+        description: |
+          Provide `view_key`/`address` pair, with optional filtering of already seen transactions.
+          
+          `since_tx_id` and `since_tx_block_hash` may be omitted, in which case all transactions are returned. If `since_tx_id` is present, `since_tx_block_hash` must be, too. The latter is used to handle the case when a blockchain reorg has rendered the requested `since_tx_id` invalid. Clients must take care to honor the `since_tx_id` returned in the response, which may be different than the value that was in the request.
+        content:
+          application/json:
+            schema:
+              type: object
+              allOf:
+                - $ref: '#/components/schemas/login'
+              properties:
+                since_tx_id:
+                  description: Most recent tx already known to client
+                  allOf:
+                    - $ref: '#/components/schemas/uint64'
+                since_tx_block_hash:
+                  description: Block hash of most recent tx
+                  allOf:
+                    - $ref: '#/components/schemas/binary32'
+        required: true
+      responses:
+        '200':
+          description: |
+            Success
+            
+            `since_tx_id` may be omitted, and shall be omitted if omitted in the request. If present, it indicates that this response includes only transactions with an `id` greater than this one. It may be different than the value in the `request`: if a blockchain reorg has rendered the requested id/block_hash pair invalid, then some or all of the prior transaction history must be present. Clients must remove all newer transactions from their local history before appending the ones from this response. If null or omitted, the response contains every transaction.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_received:
+                    #description: Sum of received outputs
+                    $ref: '#/components/schemas/uint64-string'
+                  scanned_height:
+                    description: Current tx (txid) scan progress
+                    allOf:
+                      - $ref: '#/components/schemas/uint64'
+                  scanned_block_height:
+                    description: Current scan progress
+                    allOf:
+                      - $ref: '#/components/schemas/uint64'
+                  start_height:
+                    #description: Start height of response
+                    $ref: '#/components/schemas/uint64'
+                  blockchain_height:
+                    #description: Current blockchain height
+                    $ref: '#/components/schemas/uint64'
+                  transactions:
+                    description: Possible spend info
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/transaction'
+                  lookahead:
+                    description: The lookahead state, or {0, 0} if not provided
+                    allOf:
+                      - $ref: '#/components/schemas/address_meta'
+                  lookahead_failure:
+                    description: If provided, the block number subaddress lookahead failed
+                    allOf:
+                      - $ref: '#/components/schemas/uint64'
+                  since_tx_id:
+                    description: Most recent omitted tx
+                    allOf:
+                      - $ref: '#/components/schemas/uint64'
+                required:
+                  - total_received
+                  - scanned_height
+                  - scanned_block_height
+                  - start_height
+                  - transaction_height
+                  - blockchain_height
+                  - transactions
+        '400':
+          description: Invalid JSON, or invalid base58 address.
+        '403':
+          description: Account is disabled or does not exist.
+        '405':
+          description: Not `POST` method.
+        '500':
+          description: Invalid JSON schema, and general errors.
+        '503':
+          description: Unable to read from database.
+  /get_random_outs:
+    post:
+      tags:
+        - transaction
+      summary: Get server constructed rings
+      description: |
+        Selects random outputs to use in a ring signature of a new transaction. If the `amount` is `0` then the monerod RPC get_output_distribution should be used to locally select outputs using a gamma distribution as described in "An Empirical Analysis of Traceability in the Monero Blockchain". If the `amount` is not `0`, then the `monerod` RPC `get_output_histogram` should be used to locally select outputs using a triangular distribution (`uint64_t dummy_out = histogram.total * sqrt(float64(random_uint53) / float64(2^53))`).
+      operationId: get_random_outs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                count:
+                  description: Mixin (name is historical)
+                  allOf:
+                    - $ref: '#/components/schemas/uint32'
+                amounts:
+                  description: XMR amounts that need mixing
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/uint64-string'
+              required:
+                - count
+                - amounts
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  amount_outs:
+                    description: Decoy outputs for each amounts
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/random_outputs'
+                required:
+                  - amount_outs
+        '400':
+          description: Invalid JSON.
+        '405':
+          description: Not `POST` method.
+        '500':
+          description: Invalid JSON schema, and general errors.
+        '503':
+          description: Unable to contact monero daemon.
+  /get_subaddrs:
+    post:
+      tags:
+        - subaddress
+      summary: Returns all subaddresses provisioned for a wallet
+      operationId: get_subaddrs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/login'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  all_subaddrs:
+                    $ref: '#/components/schemas/subaddrs'
+                  max_subaddrs:
+                    description: Maximum number of subaddresses permitted by server
+                    allOf:
+                      - $ref: '#/components/schemas/uint64'
+                required:
+                  - all_subaddrs
+        '400':
+          description: Invalid JSON, or invalid base58 address.
+        '403':
+          description: Account is disabled or does not exist.
+        '405':
+          description: Not `POST` method
+        '409':
+          description: Unable to provision subaddresses due to server limits.
+        '500':
+          description: Invalid JSON schema, and general errors.
+        '503':
+          description: Unable to read from database.
+  /get_tree_path:
+    post:
+      tags:
+        - transaction
+      summary: Get all information needed to build a tree cache for fmcp++ signing
+      operationId: get_tree_path
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                output_ids:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/composite_id'
+              required: [output_ids]
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  paths:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/path_spend'
+                  last_path:
+                    $ref: '#/components/schemas/path'
+                  top_block_height:
+                    $ref: '#/components/schemas/uint64'
+                  n_leaf_tuples:
+                    $ref: '#/components/schemas/uint64'
+                  top_block_hash:
+                    $ref: '#/components/schemas/binary32'
+                required:
+                  - paths
+                  - last_path
+                  - top_block_height
+                  - n_leaf_tuples
+                  - top_block_hash
+        '400':
+          description: Invalid JSON, invalid base58 address, or invalid composite_id
+        '405':
+          description: Not `POST` method
+        '500':
+          description: Invalid JSON schema, and general errors.
+        '503':
+          description: Unable to read from database.
+  /get_unspent_outs:
+    post:
+      tags:
+        - transaction
+      summary: Get data for needed for sending transaction.
+      description: Returns a list of received outputs. The client must determine when the output was actually spent.
+      operationId: get_unspent_outs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              allOf:
+                - $ref: '#/components/schemas/login'
+              properties:
+                amount:
+                  description: XMR send amount
+                  allOf:
+                    - $ref: '#/components/schemas/uint64'
+                mixin:
+                  description: Minimum mixin for source output
+                  allOf:
+                    - $ref: '#/components/schemas/uint32'
+                use_dust:
+                  description: Return all available outputs
+                  type: boolean
+                dust_threshold:
+                  description: Ignore outputs below this amount
+                  allOf:
+                    - $ref: '#/components/schemas/uint64-string'
+                lookahead_failure:
+                  description: If provided, the block number subaddress lookahead failed
+                  allOf:
+                    - $ref: '#/components/schemas/uint64'
+              required:
+                - height
+                - mixin
+                - use_dust
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  per_byte_fee:
+                    description: Estimated network fee (deprecated)
+                    allOf:
+                      - $ref: '#/components/schemas/uint64-string'
+                  fee_mask:
+                    description: Fee quantization mask
+                    allOf:
+                      - $ref: '#/components/schemas/uint64-string'
+                  amount:
+                    description: The total value in outputs
+                    allOf:
+                      - $ref: '#/components/schemas/uint64-string'
+                  outputs:
+                    description: Outputs possibly available for spending
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/output'
+                  fees:
+                    description: Priority based fee levels, starting with lowest
+                    type: array
+                    minItems: 1
+                    items:
+                      $ref: '#/components/schemas/uint64'
+                required:
+                  - per_byte_fee
+                  - fee_mask
+                  - amount
+                  - outputs
+        '400':
+          description: Invalid JSON, or invalid base58 address.
+        '403':
+          description: Account is disabled or does not exist.
+        '405':
+          description: Not `POST` method.
+        '500':
+          description: Invalid JSON schema, and general errors.
+        '503':
+          description: Unable to read from database or unable to get monero daemon fee.
+  /get_version:
+    get:
+      summary: Get basic information about Server
+      operationId: get_version
+      responses:
+        '200':
+          description: Succeeded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  server_type:
+                    type: string
+                    description: Name of server implementation
+                  last_git_commit_hash:
+                    description: A hash (of server determined length) corresponding to commit hash
+                    allOf:
+                      - $ref: '#/components/schemas/binary'
+                  last_commit_date:
+                    type: string
+                    description: Implementation defined commit date
+                  monero_version_full:
+                    description: Implementation defined version string
+                    type: string
+                  blockchain_height:
+                    description: Current blockchain height (as processed by LWS server)
+                    allOf:
+                      - $ref: '#/components/schemas/uint64'
+                  api:
+                    description: Unique number per schema Implementation
+                    type: integer
+                  max_subaddresses:
+                    description: Max subaddresses allowed by server
+                    type: integer
+                  network:
+                    description: Name of network type
+                    type: string
+                  testnet:
+                    type: boolean
+  /import_wallet_request:
+    post:
+      tags:
+        - account
+      summary: Restore from height with optional subaddress lookahead
+      operationId: import_wallet_request
+      requestBody:
+        description: Provide `view_key`/`address` pair
+        content:
+          application/json:
+            schema:
+              description: |
+                If `height` is omitted, then it assumed to be `0`. If lookahead is omitted, it assumed to be `{0, 0}`.
+              type: object
+              allOf:
+                - $ref: '#/components/schemas/login'
+              properties:
+                from_height:
+                  $ref: '#/components/schemas/uint64'
+                lookahead:
+                  description: "Desired lookahead for (re)scan"
+                  allOf:
+                    - $ref: '#/components/schemas/address_meta'
+        required: true
+      responses:
+        '200':
+          description: "`payment_id`, `import_fee`, and `payment_address` may be omitted if the client does not need to send XMR to complete the request."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payment_address: 
+                    description: Payment location to enable rescan
+                    allOf:
+                      - $ref: '#/components/schemas/base58-address'
+                  payment_id:
+                    description: Bytes for payment_id field to track rescan
+                    allOf:
+                      - $ref: '#/components/schemas/binary8'
+                  import_fee:
+                    description: Fee required to complete request
+                    allOf:
+                      - $ref: '#/components/schemas/uint64-string'
+                  new_request:
+                    description: "New or existing request"
+                    type: boolean
+                  request_fulfilled:
+                    description: Indicates success
+                    type: boolean
+                  status:
+                    description: Custom message
+                    type: string
+                    example: "OK"
+                  lookahead:
+                    description: The lookahead state, or {0, 0} if not provided
+                    allOf:
+                      - $ref: '#/components/schemas/address_meta'
+                required:
+                  - new_request
+                  - request_fulfilled
+                  - status
+        '400':
+          description: Invalid JSON, or invalid base58 address.
+        '403':
+          description: Account is disabled or does not exist
+        '405':
+          description: Not `POST` method
+        '500':
+          description: Invalid JSON schema, and general errors
+        '503':
+          description: Unable to read from database
+  /login:
+    post:
+      tags:
+        - account
+      summary: Create and check account status
+      description: |
+        The `view_key` bytes are required even if an account is not being created, to prevent metadata leakage.
+      operationId: login
+      requestBody:
+        description: Provide `view_key`/`address` pair
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/login'
+              properties:
+                create_account:
+                  type: boolean
+                  description: True when account creation should be attempted
+                generated_locally:
+                  type: boolean
+                  description: True if the account is new (not restored/imported)
+                lookahead:
+                  description: "Desired lookahead for new accounts"
+                  allOf:
+                    - $ref: '#/components/schemas/address_meta'
+              required:
+                - create_account
+                - generated_locally
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  new_address:
+                    description: Whether account was just created
+                    type: boolean
+                  generated_locally:
+                    description: Flag from initial account creation
+                    type: boolean
+                  start_height:
+                    description: Account scanning start block
+                    allOf:
+                      - $ref: '#/components/schemas/uint64'
+                  lookahead:
+                    description: The lookahead state, or {0, 0} if not provided
+                    allOf:
+                      - $ref: '#/components/schemas/address_meta'
+                required:
+                  - new_address
+        '400':
+          description: Invalid JSON, or invalid base58 address.
+        '403':
+          description: "`view_key`/`address` pair is invalid"
+        '405':
+          description: Not `POST` method.
+        '500':
+          description: Invalid JSON schema, and general errors.
+        '501':
+          description: Account creation is not allowed.
+        '503':
+          description: Unable to read or write from database.
+  /provision_subaddrs:
+    post:
+      tags:
+        - subaddress
+      summary: Request new sub address ranges
+      description: |
+        Provision subaddresses at specified indexes. No two clients should ever receive the same newly provisioned subaddresses when calling this endpoint; the server should guarantee that newly provisioned subaddresses are fresh.
+      operationId: provision_subaddrs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: |
+                The various combinations of `maj_i`, `min_i`, `n_maj`, and `n_min` behave differently, but generally the server provisions subaddresses where it has not already provisioned them, with the indexes specified as lower bounds. If, for example, only `maj_i` is included, then the server should provision a default number of minor subaddresses (e.g. 500) within that `maj_i`, wherever minor subaddresses have not already been provisioned, starting with `min_i` set to 0 as the lower bound.
+                
+                  If, for example, `maj_i`, `min_i`, `n_maj` and `n_min` are included, then the server should provision `n_maj` majors wherever major subaddresses have not already been provisioned starting with `maj_i` as the lower bound, and for each major, provision `n_min` subaddresses starting with `min_i` as the lower bound.
+                  
+                  If, for example, `maj_i`, `min_i`, `n_maj` and `n_min` are included, then the server should provision `n_maj` majors wherever major subaddresses have not already been provisioned starting with `maj_i` as the lower bound, and for each major, provision `n_min` subaddresses starting with `min_i` as the lower bound.
+                  
+                  All combinations follow the above framework. The server can choose to "pad" counts and provision *more* than a client requests.
+                  
+                  If the server cannot provision a specified number of subaddresses because the server would provision more than the maximum number of subaddresses, HTTP 409 should be returned. Ack that the status code is not perfect here. In this case, the client should make a new request either with a smaller requested number of subaddresses to provision, or at a different major or minor index. If none of `maj_i`, `min_i`, `n_maj`, and `n_min` are included in the request, the server must return a HTTP 400 "Bad Request" error. `get_all` defaults to true if not included in the request.
+              type: object
+              allOf:
+                - $ref: '#/components/schemas/login'
+              properties:
+                maj_i:
+                  description: Subaddress major index (defaults to 0)
+                  allOf:
+                    - $ref: '#/components/schemas/uint32'
+                min_i:
+                  description: Subaddress minor index (defaults to 0)
+                  allOf:
+                    - $ref: '#/components/schemas/uint32'
+                n_maj:
+                  description: Number of major subaddresses to provision
+                  allOf:
+                    - $ref: '#/components/schemas/uint32'
+                n_min:
+                  description: Number of minor subaddresses to provision
+                  allOf:
+                    - $ref: '#/components/schemas/uint32'
+                get_all:
+                  description: Whether to include all subaddresses in response. Defaults to true.
+                  type: boolean
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/new_subaddrs'
+        '400':
+          description: Invalid JSON, or invalid base58 address.
+        '403':
+          description: Account is disabled or does not exist.
+        '405':
+          description: Not `POST` method.
+        '409':
+          description: Unable to provision subaddresses due to server limits.
+        '500':
+          description: Invalid JSON schema, and general errors.
+        '503':
+          description: Unable to read or write from database
+  /submit_raw_tx:
+    post:
+      tags:
+        - transaction
+      summary: Send a transaction to the Monero network
+      description: |
+        This format is tricky unfortunately, it is custom to the monero daemon. The internal code of monerod must be read to determine this format currently.
+      operationId: submit_raw_tx
+      requestBody:
+        description: Provide `view_key`/`address` pair
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tx:
+                  $ref: '#/components/schemas/binary'
+              required:
+                - tx
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    description: Typically the response by the monero daemon attempting to relay the transaction.
+                    type: string
+                    example: "OK"
+                required:
+                  - status
+        '400':
+          description: Invalid JSON.
+        '405':
+          description: Not `POST` method.
+        '500':
+          description: Invalid JSON schema, and general errors.
+        '503':
+          description: Unable to communicate with monero daemon.
+  /upsert_subaddrs:
+    post:
+      tags:
+        - subaddress
+      summary: Upsert new subaddresses
+      description: |
+        Upsert subaddresses at the specified major and minor indexes. This endpoint is idempotent.
+      operationId: upsert_subaddrs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              allOf:
+                - $ref: '#/components/schemas/login'
+              properties:
+                subaddrs:
+                  description: Subaddresses to upsert
+                  type: array
+                  minItems: 1
+                  items:
+                    $ref: '#/components/schemas/subaddrs'
+                get_all:
+                  description: Whether to include all subaddresses in response. Defaults to true
+                  type: boolean
+              required:
+                - subaddrs
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/new_subaddrs'
+        '400':
+          description: Invalid JSON.
+        '403':
+          description: Account is disabled or does not exist
+        '405':
+          description: Not `POST` method
+        '409':
+          description: Unable to provision subaddresses due to server limits
+        '500':
+          description: Invalid JSON schema, and general errors
+        '503':
+          description: Unable to read from database
+components:
+  schemas:
+    base58-address:
+      type: string
+      description: "Standard Monero address in base58"
+      minLength: 95
+      maxLength: 95
+      pattern: "^[0-9A-Za-z]{95}$"
+      example: "47nPhxp2cJeKN2NjamupNUNA13XgzcYPzQBCzzsKcj717s8M2UpFVmmdwSuYwgyy8kPDwU7hpEqTTDvfe5LAb9Aj6nwmEzf"
+    binary:
+      type: string
+      description: "binary data as hex (arbitrary length)"
+      pattern: "^([0-9A-Fa-f]{2})+$"
+      example: "0abcd9dcf0bca63310bb4d7e120918d1"
+    binary8:
+      type: string
+      description: "8-bytes binary data as hex"
+      minLength: 16
+      maxLength: 16
+      pattern: "^[0-9A-Fa-f]{16}$"
+      example: "6d26cac5c9d74f4e"
+    binary32:
+      type: string
+      description: "32-bytes binary data as hex"
+      minLength: 64
+      maxLength: 64
+      pattern: "^[0-9A-Fa-f]{64}$"
+      example: "ee171270296bbc26d5be4455b6313e1a2086a92080e205f77d6f861f8e5fd205"
+    ringct-packed:
+      type: string
+      description: |
+        A "packed" hex struct containing: commitment|mask|amount. Only the 'mask' is needed, as the amount is already sent, and the commitment can be re-computed from the mask and amount. This format is used for legacy purposes.
+      pattern: "^[0-9A-Fa-f]{192}$"
+      example: "09e732db4d2154dcd79eff818d105184dcf8223ecbfeb64d4673334756ca9433a28dcc2511cb636dc836722f4f54f97e7a84d7aed012798a8f65229004e6dc299500de68879730a32933bd4df0a3a5927149ea8f678e42cbd863c166c73c920d"
+    ringct-random:
+      type: string
+      description: |
+        The first 64-bytes are the hex of the ringct commitment. The next 64-bytes are optionally sent (for legacy purposes), but still required to be hex.
+      pattern: "^[0-9A-Fa-f]{64}([0-9A-Fa-f]{128}){0,1}$"
+      example: "09e732db4d2154dcd79eff818d105184dcf8223ecbfeb64d4673334756ca9433"
+    payment-id:
+      description: 8-Byte encrypted payment-id or 32-byte unencrypted payment-id (deprecated)
+      oneOf:
+        - $ref: '#/components/schemas/binary8'
+        - $ref: '#/components/schemas/binary32'
+    uint64-string:
+      type: string
+      description: An unsigned 64-bit value encoded as a string
+      pattern: "^[1-9][0-9]{0,19}$"
+      minLength: 1
+      maxLength: 20
+      example: "10"
+    uint16:
+      type: integer
+      minimum: 0
+      maximum: 65535
+    uint32:
+      type: integer
+      minimum: 0
+      maximum: 4294967295
+    uint64:
+      type: integer
+      minimum: 0
+      maximum: 18446744073709551615
+    timestamp:
+      description: "'YYYY-MM-DDTHH:MM:SSZ' in UTC/Zulu timezone. No sub-subseconds"
+      type: string
+      pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}:[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+      example: "2025-06-29T20:44:32Z"
+    login:
+      type: object
+      properties:
+        address:
+          $ref: '#/components/schemas/base58-address'
+        view_key:
+          $ref: '#/components/schemas/binary32'
+      required:
+        - address
+        - view_key
+    address_meta:
+      type: object
+      description: A subaddress meta block (major, minor) index
+      properties:
+        maj_i:
+          $ref: '#/components/schemas/uint32'
+        min_i:
+          $ref: '#/components/schemas/uint32'
+      required:
+        - maj_i
+        - min_i
+    index_range:
+      description: |
+        The first element is the inclusive lower bound of the range. The second element is the inclusive upper bound of the range. The second element is greater than or equal to the first element.
+      type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        $ref: '#/components/schemas/uint32'
+    legacy_id:
+      type: object
+      description: Specify an output using pre-fcmp++ indexing
+      properties:
+        amount:
+          $ref: '#/components/schemas/uint64'
+        index:
+          $ref: '#/components/schemas/uint64'
+    composite_id:
+      type: object
+      description: Specify an output using pre or post fcmp++ indexing
+      oneOf:
+        -
+          type: object
+          properties:
+            legacy:
+              $ref: '#/components/schemas/legacy_id'
+        -
+          type: object
+          properties:
+            unified:
+              $ref: '#/components/schemas/uint64'
+    output_pair:
+      type: object
+      description: The public-keys related to an output
+      properties:
+        output_pubkey:
+          $ref: '#/components/schemas/binary32'
+        commitment:
+          $ref: '#/components/schemas/binary32'
+    leaf:
+      type: object
+      description: Called `OutputContext` in Monero codebase
+      properties:
+        output_id:
+          description: Unified (post fcmp++) output identifier
+          allOf:
+            - $ref: '#/components/schemas/uint64'
+        torsion_checked:
+          type: boolean
+          description: True if checked for (lack of) Torsion point
+        output_pair:
+          $ref: '#/components/schemas/output_pair'
+    chunk:
+      type: object
+      properties:
+        chunk_bytes:
+          description: Curve points in the tree path
+          type: array
+          items:
+            $ref: '#/components/schemas/binary32'
+    path:
+      type: object
+      properties:
+        leaves:
+          type: array
+          items:
+            $ref: '#/components/schemas/leaf'
+        layer_chunks:
+          type: array
+          items:
+            $ref: '#/components/schemas/chunk'
+    path_spend:
+      type: object
+      properties:
+        path:
+          $ref: '#/components/schemas/path'
+        output_id:
+          $ref: '#/components/schemas/composite_id'
+        leaf_idx:
+          $ref: '#/components/schemas/uint64'
+    subaddrs:
+      description: |
+        Key is the major index of Monero subaddresses, values are the minor indexes of subaddresses within that major index.
+      type: object
+      properties:
+        key:
+          $ref: '#/components/schemas/uint32'
+        value:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/index_range'
+      required:
+        - key
+        - value
+    new_subaddrs:
+      type: object
+      properties:
+        new_subaddrs:
+          #description: All new subaddresses provisioned in the request
+          $ref: '#/components/schemas/subaddrs'
+        all_subaddrs:
+          #descriptiopn: All subaddresses provisioned for the wallet (including new)
+          $ref: '#/components/schemas/subaddrs'
+      required:
+        - new_subaddrs
+    output:
+      type: object
+      properties:
+        tx_id:
+          #description: "Index of tx in blockchain"
+          $ref: '#/components/schemas/uint64'
+        amount:
+          #description: "XMR value of output"
+          $ref: '#/components/schemas/uint64-string'
+        index:
+          description: Index within vout vector
+          allOf: 
+            - $ref: '#/components/schemas/uint16'
+        global_index:
+          description: Index within amount (determined by blockchain order)
+          allOf:
+            - $ref: '#/components/schemas/uint64-string'
+        rct:
+          $ref: '#/components/schemas/ringct-packed'
+        tx_hash:
+          #description: "Bytes of tx hash"
+          $ref: '#/components/schemas/binary32'
+        tx_prefix_hash:
+          #description: "Bytes of tx prefix hash"
+          $ref: '#/components/schemas/binary32'
+        public_key:
+          #description: "Bytes of output public key"
+          $ref: '#/components/schemas/binary32'
+        tx_pub_key:
+          description: Bytes of the ephermal tx public key
+          allOf:
+            - $ref: '#/components/schemas/binary32'
+        spend_key_images:
+          description: "Bytes of key images"
+          type: array
+          items:
+            $ref: '#/components/schemas/binary32'
+        timestamp:
+          $ref: '#/components/schemas/timestamp'
+        height:
+          description: Block height
+          allOf:
+            - $ref: '#/components/schemas/uint64'
+        recipient:
+          $ref: '#/components/schemas/address_meta'
+      required:
+        - tx_id
+        - amount
+        - index
+        - global_index
+        - tx_hash
+        - tx_prefix_hash
+        - public_key
+        - tx_pub_key
+        - spend_key_images
+        - timestamp
+        - height
+    rates:
+      description: "Conversion rates into common/popular currencies"
+      type: object
+      properties:
+        AUD:
+          description: "AUD/XMR exchange rate"
+          type: number	
+        BRL:
+          description: "BRL/XMR exchange rate"
+          type: number
+        BTC:
+          description: "BTC/XMR exchange rate"
+          type: number
+        CAD:
+          description: "CAD/XMR exchange rate"
+          type: number
+        CHF:
+          description: "CHF/XMR exchange rate"
+          type: number
+        CNY:
+          description: "CNY/XMR exchange rate"
+          type: number
+        EUR:
+          description: "EUR/XMR exchange rate"
+          type: number
+        GBP:
+          description: "GBP/XMR exchange rate"
+          type: number
+        HKD:
+          description: "HKD/XMR exchange rate"
+          type: number
+        INR:
+          description: "INR/XMR exchange rate"
+          type: number
+        JPY:
+          description: "JPY/XMR exchange rate"
+          type: number
+        KRW:
+          description: "KRW/XMR exhcnage rate"
+          type: number
+        MXN:
+          description: "MXN/XMR exchange rate"
+          type: number
+        NOK:
+          description: "NOK/XMR exchange rate"
+          type: number
+        NZD:
+          description: "NZD/XMR exchange rate"
+          type: number
+        SEK:
+          description: "SEK/XMR exchange rate"
+          type: number
+        SGD:
+          description: "SGD/XMR exchange rate"
+          type: number
+        TRY:
+          description: "TRY/XMR exchange rate"
+          type: number
+        USD:
+          description: "USD/XMR exchange rate"
+          type: number
+        RUB:
+          description: "RUB/XMR exchange rate"
+          type: number
+        ZAR:
+          description: "ZAR/XMR exchange rate"
+          type: number
+    spend:
+      description: |
+        This object represents a single _possible_ spend
+        
+        `out_index` is a zero-based offset from the original received output. The variable within the monero codebase is the vout array, this is the index within that. It is needed for correct computation of the key_image.
+        
+        `mixin` does not include the real spend - this is the number of dummy inputs.
+      type: object
+      properties:
+        amount:
+          #description: "XMR possibly being spent"
+          $ref: '#/components/schemas/uint64-string'
+        key_image:
+          #description: "Bytes of the key image"
+          $ref: '#/components/schemas/binary32'
+        tx_pub_key:
+          description: Bytes of the ephermal tx public key
+          allOf:
+            - $ref: '#/components/schemas/binary32'
+        out_index:
+          description: Index (within vout vector) of source output
+          allOf:
+            - $ref: '#/components/schemas/uint16'
+        mixin:
+          #description: "Mixin of the spend"
+          $ref: '#/components/schemas/uint32'
+        sender:
+          $ref: '#/components/schemas/address_meta'
+      required:
+        - amount
+        - key_image
+        - tx_pub_key
+        - out_index
+        - mixin
+    transaction:
+      description: |
+        This object represents a single Transaction on the blockchain
+        
+        `id` is determined by the monero daemon. It is the offset that a transaction appears in the blockchain from the genesis block.
+        
+        `timestamp`, `height` and `block_hash` are not sent when `mempool` is true.
+        
+        `hash` is determined by how the monero core computes the hash.
+        
+        `spent_outputs` is the list of possible spends in this transaction only.
+        
+        `payment_id` is omitted if the transaction had none. It is decrypted when the encrypted form is used. The decryption may be incorrect - if the transaction was TO another address, then this will be random bytes. This happens frequently with outgoing payment ids; the received XMR in the transaction is change and the payment id is for the real recipient.
+        
+        `mixin` does not include the real spend - this is the number of decoy inputs.
+      properties:
+        id:
+          description: "Index of tx in blockchain"
+          allOf:
+            - $ref: '#/components/schemas/uint64'
+        hash:	
+          #description: "Bytes of tx hash"
+          $ref: '#/components/schemas/binary32'
+        timestamp:
+          $ref: '#/components/schemas/timestamp'
+        total_received:
+          #description: "Total XMR received"
+          $ref: '#/components/schemas/uint64-string'
+        total_sent:
+          #description: "XMR possibly being spent"
+          $ref: '#/components/schemas/uint64-string'
+        unlock_time:
+          #description: "Tx unlock time field"
+          $ref: '#/components/schemas/uint64'
+        block_hash:
+          $ref: '#/components/schemas/binary32'
+        height:
+          description: Block height
+          allOf:
+            - $ref: '#/components/schemas/uint64'
+        spent_outputs:
+          description: List of possible spends
+          type: array
+          items:
+            $ref: '#/components/schemas/spend'
+        payment_id:
+          $ref: '#/components/schemas/payment-id'
+        coinbase:
+          type: boolean
+        mempool:
+          type: boolean
+        mixin:
+          #description: "Mixin of the receive"
+          $ref: '#/components/schemas/uint32'
+      required:
+        - id
+        - hash
+        - total_received
+        - total_sent
+        - unlock_time
+        - spent_outputs
+        - coinbase
+        - mempool
+        - mixin
+    random_output:
+      description: |
+        A single random output, used for generating ring signatures.
+        
+        `global_index` is determined by the monero daemon. It is the offset from the first time the amount appeared in the blockchain. After ringct, this is the order of outputs as they appear in the blockchain.
+      type: object
+      properties:
+        global_index:
+          description: Index within amount
+          allOf:
+            - $ref: '#/components/schemas/uint64-string'
+        public_key:
+          #description: "Bytes of output public key"
+          $ref: '#/components/schemas/binary32'
+        rct:
+          #description: "Bytes containing ringct commitment"
+          $ref: '#/components/schemas/ringct-random'
+      required:
+        - global_index
+        - public_key
+    random_outputs:
+      description: |
+        `outputs` is omitted by the server if the amount does not have enough mixable outputs.
+      type: object
+      properties:
+        amount:
+          $ref: '#/components/schemas/uint64-string'
+        outputs:
+          description: Server selected ring
+          type: array
+          items:
+            $ref: '#/components/schemas/random_output'
+      required:
+        - amount
+        - outputs
