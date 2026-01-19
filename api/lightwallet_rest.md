@@ -208,6 +208,64 @@ Randomly selected outputs for use in a ring signature.
 > `outputs` is omitted by the server if the `amount` does not have enough
 > mixable outputs.
 
+**legacy_id** object
+
+The output indexing scheme used before fcmp++.
+
+| Field  |   Type   |                  Description                       |
+|--------|----------|----------------------------------------------------|
+| amount | `uint64` | The amount of the output                           |
+| index  | `uint64` | The index within `amount` as recorded by `monerod` |
+
+**composite_id** object
+
+Specifies whether the output is being indexed by the legacy or unified system.
+
+|  Field  |        Type        |           Description          |
+|---------|--------------------|--------------------------------|
+| legacy  | `legacy_id` object | Index is legacy (pre-fcmp++)   |
+| unified | `uint64`           | Index is unified (post-fcmp++) |
+
+**output_pair** object
+
+|     Field     |   Type   |                  Description                   |
+|---------------|----------|------------------------------------------------|
+| output_pubkey | `binary` | One-time public-key for output                 |
+| commitment    | `binary` | The confidential-transaction amount commitment |
+
+**leaf** object
+Called `OutputContext` in monero codebase.
+
+|      Field      |     Type      |              Description               |
+|-----------------|---------------|----------------------------------------|
+| output_id       | `uint64`      | Unified ID                             |
+| torsion_checked | boolean       | True if torsion point has been checked |
+| output_pair     | `output_pair` | Public keys of output                  |
+
+**chunk** object
+
+|    Field    |          Type           |             Description              |
+|-------------|-------------------------|--------------------------------------|
+| chunk_bytes | array of `binary` blobs | Curve points from the `monerod` tree |
+
+**path** object
+
+
+|    Field     |           Type           |              Description              |
+|--------------|--------------------------|---------------------------------------|
+| leaves       | array of `leaf` objects  | As determined by `monerod` tree state |
+| layer_chunks | array of `chunk` objects | As determined by `monerod` tree state |
+
+**path_spend** object
+
+All information needed to insert an output into a tree cache.
+
+|   Field   |         Type          |                Description                 |
+|-----------|-----------------------|--------------------------------------------|
+| path      | `path` object         | Path object needed to construct tree cache |
+| output_id | `composite_id` object | Unique identifier for the output           |
+| leaf_idx  | `uint64`              | As determined by `monerod` tree state      |
+
 ### Methods
 #### `get_address_info`
 Returns the minimal set of information needed to calculate a wallet balance.
@@ -298,6 +356,32 @@ locally select outputs using a triangular distribution
 
 > If there are not enough outputs to mix for a specific amount, the server
 > shall omit the `outputs` field in `amount_outs`.
+
+### `get_tree_paths`
+
+Get everything needed to construct a fcmp++ tree proof. The response will
+include the full path of every requested output, and information needed to
+initialize a tree at the current height.
+
+**Request** object
+
+|    Field   |              Type               |          Description           |
+|------------|---------------------------------|--------------------------------|
+| output_ids | array of `composite_id` objects | Indexes of outputs being spent |
+
+**Response** object
+
+|      Field       |              Type             |        Description         |
+|------------------|-------------------------------|----------------------------|
+| paths            | array of `path_spend` objects | Paths of requested outputs |
+| last_path        | `path` object                 | Used for tree cache init   |
+| top_block_height | `uint64`                      | Used for tree cache init   |
+| n_leaf_tuples    | `uint64`                      | Used for tree cache init   |
+| top_block_hash   | `binary`                      | Used for tree cache init   |
+
+> Server should return a HTTP 400 "Bad Request" if a `composite_id` is invalid
+> (no such output).
+
 
 #### `get_unspent_outs`
 Returns a list of received outputs. The client must determine when the output
