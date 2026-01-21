@@ -238,6 +238,8 @@ list of candidate spends is returned.
 | blockchain_height    | `uint64`                 | Current blockchain height |
 | spent_outputs        | array of `spend` objects | Possible spend info       |
 | rates *              | `rates`                  | Current exchange rates    |
+| lookahead *          | `address_meta`           | Current lookahead status  |
+| lookahead_fail *     | `uint64`                 | Block lookahead failed    |
 
 > `rates` is omitted if unavailable.
 
@@ -266,6 +268,8 @@ spends is returned.
 | start_height         | `uint64`                       | Start height of response  |
 | blockchain_height    | `uint64`                       | Current blockchain height |
 | transactions         | array of `transaction` objects | Possible spend info       |
+| lookahead *          | `address_meta`                 | Current lookahead status  |
+| lookahead_fail *     | `uint64`                       | Block lookahead failed    |
 
 #### `get_random_outs`
 Selects random outputs to use in a ring signature of a new transaction. If the
@@ -313,6 +317,7 @@ was actually spent.
 | mixin            | `uint32`         | Minimum mixin for source output  |
 | use_dust         | `boolean`        | Return all available outputs     |
 | dust_threshold * | `uint64-string`  | Ignore outputs below this amount |
+| lookahead_fail * | `uint64`         | Block lookahead failed           |
 
 > If the total received outputs for the address is less than `amount`, the
 > server shall return a HTTP 400 "Bad Request" error code.
@@ -326,15 +331,20 @@ was actually spent.
 | amount       | `uint64-string`           | The total value in outputs              |
 | outputs      | array of `output` objects | Outputs possibly available for spending |
 
-#### `import_request`
+#### `import_wallet_request`
 Request an account scan from the genesis block.
 
 **Request** object
 
-|   Field  |       Type       |      Description        |
-|----------|------------------|-------------------------|
-| address  | `base58-address` | Address to create/probe |
-| view_key | `binary`         | View key bytes          |
+|     Field     |       Type       |       Description        |
+|---------------|------------------|--------------------------|
+| address       | `base58-address` | Address to create/probe  |
+| view_key      | `binary`         | View key bytes           |
+| from_height * | `uint64`         | import start height      |
+| lookahead *   | `address_meta`   | use subaddress lookahead |
+
+> The `lookahead` field is to be interpreted as an attempted change of the
+> lookahead.
 
 **Response** object
 
@@ -343,12 +353,16 @@ Request an account scan from the genesis block.
 | payment_address *  | `base58-address` | Payment location                 |
 | payment_id *       | `binary`         | Bytes for payment_id tx field    |
 | import_fee *       | `uint64-string`  | Fee required to complete request |
+| lookahead *        | `boolean`        | Lookahead enabled and active     |
 | new_request        | `boolean`        | New or existing request          |
 | request_fulfilled  | `boolean`        | Indicates success                |
 | status             | `string`         | Custom message                   |
 
 > `payment_id`, `import_fee`, and `payment_address` may be omitted if the
 > client does not need to send XMR to complete the request.
+
+> If `lookahead` is omitted or false, clients should assume the lookahead
+> request was silently rejected.
 
 #### `login`
 Check for the existence of an account or create a new one.
@@ -361,6 +375,7 @@ Check for the existence of an account or create a new one.
 | view_key          | `binary`         | View key bytes                   |
 | create_account    | `boolean`        | Try to create new account        |
 | generated_locally | `boolean`        | Indicate that the address is new |
+| lookahead *       | `address_meta`   | Use lookahead for new accounts   |
 
 > The view key bytes are required even if an account is not being created, to
 > prevent metadata leakage.
@@ -374,11 +389,12 @@ Check for the existence of an account or create a new one.
 
 **Response** object
 
-|        Field        |   Type    |            Description             |
-|---------------------|-----------|------------------------------------|
-| new_address         | `boolean` | Whether account was just created   |
-| generated_locally * | `boolean` | Flag from initial account creation |
-| start_height *      | `uint64`  | Account scanning start block       |
+|        Field        |      Type      |            Description             |
+|---------------------|----------------|------------------------------------|
+| new_address         | `boolean`      | Whether account was just created   |
+| generated_locally * | `boolean`      | Flag from initial account creation |
+| start_height *      | `uint64`       | Account scanning start block       |
+| lookahead *         | `address_meta` | Actual lookahead in use            |
 
 #### `submit_raw_tx`
 Submit raw transaction to be relayed to monero network.
