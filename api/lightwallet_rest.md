@@ -51,7 +51,14 @@ concept - a public key or hash.
 
 **base58-address**
 
-A standard Monero public address encoded as a string in JSON.
+A Monero public address encoded as a string in JSON.
+
+**address_meta** object
+
+| Field |   Type   |      Description       |
+|-------|----------|------------------------|
+| maj_i | `uint32` | Subaddress major index |
+| min_i | `uint32` | Subaddress minor index |
 
 **output** object
 
@@ -71,6 +78,7 @@ Information needed to spend an output.
 | spend_key_images | array of `binary` objects | Bytes of key images           |
 | timestamp        | `timestamp`               | Timestamp of containing block |
 | height           | `uint64`                  | Containing block height       |
+| recipient        | `address_meta` object     | Address data of the recipient |
 
 > `tx_id` is determined by the monero daemon. It is the offset that a
 > transaction appears in the blockchain from the genesis block.
@@ -121,13 +129,14 @@ Information needed to spend an output.
 
 **spend** object
 
-|    Field   |       Type      |       Description          |
-|------------|-----------------|----------------------------|
-| amount     | `uint64-string` | XMR possibly being spent   |
-| key_image  | `binary`        | Bytes of the key image     |
-| tx_pub_key | `binary`        | Bytes of the tx public key |
-| out_index  | `uint16`        | Index of source output     |
-| mixin      | `uint32`        | Mixin of the spend         |
+|    Field   |          Type         |        Description         |
+|------------|-----------------------|----------------------------|
+| amount     | `uint64-string`       | XMR possibly being spent   |
+| key_image  | `binary`              | Bytes of the key image     |
+| tx_pub_key | `binary`              | Bytes of the tx public key |
+| out_index  | `uint16`              | Index of source output     |
+| mixin      | `uint32`              | Mixin of the spend         |
+| sender     | `address_meta` object | Address data of the sender |
 
 > `out_index` is a zero-based offset from the original received output. The
 > variable within the monero codebase is the `vout` array, this is the index
@@ -208,21 +217,44 @@ Randomly selected outputs for use in a ring signature.
 > `outputs` is omitted by the server if the `amount` does not have enough
 > mixable outputs.
 
+**index_range** array
+
+An array of fixed size 2, denoting an inclusive range. The first element is the
+inclusive lower bound of the range. The second element is the inclusive upper
+bound of the range. The second element is greater than or equal to the first
+element. Both elements are of type `uint32`. Example: `[3,5]`.
+
+**subaddrs** dictionary
+
+Keys are the major index of Monero subaddresses, values are the minor indexes
+of subaddresses within that major index.
+
+|       |             Type              |                Description              |
+|-------|-------------------------------|-----------------------------------------|
+| Key   | `uint32`                      | Subaddress major index                  |
+| Value | array of `index_range` arrays | Minor subaddresses within the the major |
+
+> Minor subaddresses are in strictly increasing order with no overlapping
+> bounds. For example, they can be `[[0,3],[5,9]]`, but not `[[0,3],[2,6]]`.
+
 ### Methods
 #### `get_address_info`
-Returns the minimal set of information needed to calculate a wallet balance.
-The server cannot calculate when a spend occurs without the spend key, so a
-list of candidate spends is returned.
+Returns the minimal set of information needed to calculate a wallet balance,
+including the balance of subaddresses. The server cannot calculate when a spend
+occurs without the spend key, so a list of candidate spends is returned.
 
 **Request** object
 
 |   Field   |       Type       |            Description                |
 |-----------|------------------|---------------------------------------|
-| address   | `base58-address` | Address to retrieve                   |
+| address   | `base58-address` | Standard address of the wallet        |
 | view_key  | `binary`         | View key bytes for authorization      |
 
 > If `address` is not authorized, the server must return a HTTP 403
 > "Forbidden" error.
+
+> If `address` is not a standard address, the server must return a HTTP 400
+> "Bad Request" error.
 
 **Response** object
 
@@ -244,17 +276,21 @@ list of candidate spends is returned.
 #### `get_address_txs`
 Returns information needed to show transaction history. The server cannot
 calculate when a spend occurs without the spend key, so a list of candidate
-spends is returned.
+spends is returned. The response should show a wallet's entire history,
+including transactions to and from subaddresses.
 
 **Request** object
 
 |   Field  |        Type      |             Description               |
 |----------|------------------|---------------------------------------|
-| address  | `base58-address` | Address to retrieve                   |
+| address  | `base58-address` | Standard address of the wallet        |
 | view_key | `binary`         | View key bytes for authorization      |
 
 > If `address` is not authorized, the server must return a HTTP 403
 > "Forbidden" error.
+
+> If `address` is not a standard address, the server must return a HTTP 400
+> "Bad Request" error.
 
 **Response** object
 
@@ -300,14 +336,14 @@ locally select outputs using a triangular distribution
 > shall omit the `outputs` field in `amount_outs`.
 
 #### `get_unspent_outs`
-Returns a list of received outputs. The client must determine when the output
-was actually spent.
+Returns a list of received outputs to the wallet, including to subaddresses.
+The client must determine when the output was actually spent.
 
 **Request** object
 
 |       Field      |       Type       |           Description            |
 |------------------|------------------|----------------------------------|
-| address          | `base58-address` | Address to create/probe          |
+| address          | `base58-address` | Standard address of the wallet   |
 | view_key         | `binary`         | View key bytes                   |
 | amount           | `uint64-string`  | XMR send amount                  |
 | mixin            | `uint32`         | Minimum mixin for source output  |
@@ -316,6 +352,9 @@ was actually spent.
 
 > If the total received outputs for the address is less than `amount`, the
 > server shall return a HTTP 400 "Bad Request" error code.
+
+> If `address` is not a standard address, the server must return a HTTP 400
+> "Bad Request" error.
 
 **Response** object
 
@@ -331,10 +370,10 @@ Request an account scan from the genesis block.
 
 **Request** object
 
-|   Field  |       Type       |      Description        |
-|----------|------------------|-------------------------|
-| address  | `base58-address` | Address to create/probe |
-| view_key | `binary`         | View key bytes          |
+|   Field  |       Type       |            Description         |
+|----------|------------------|--------------------------------|
+| address  | `base58-address` | Standard address of the wallet |
+| view_key | `binary`         | View key bytes                 |
 
 **Response** object
 
@@ -350,6 +389,9 @@ Request an account scan from the genesis block.
 > `payment_id`, `import_fee`, and `payment_address` may be omitted if the
 > client does not need to send XMR to complete the request.
 
+> If `address` is not a standard address, the server must return a HTTP 400
+> "Bad Request" error.
+
 #### `login`
 Check for the existence of an account or create a new one.
 
@@ -357,7 +399,7 @@ Check for the existence of an account or create a new one.
 
 |       Field       |       Type       |           Description            |
 |-------------------|------------------|----------------------------------|
-| address           | `base58-address` | Address to create/probe          |
+| address           | `base58-address` | Standard address of the wallet   |
 | view_key          | `binary`         | View key bytes                   |
 | create_account    | `boolean`        | Try to create new account        |
 | generated_locally | `boolean`        | Indicate that the address is new |
@@ -371,6 +413,9 @@ Check for the existence of an account or create a new one.
 > If approval process is manual, a successful HTTP 200 OK and response object
 > must be returned. Subsequent requests shall be HTTP 403 "Forbidden" until
 > account is approved.
+
+> If `address` is not a standard address, the server must return a HTTP 400
+> "Bad Request" error.
 
 **Response** object
 
@@ -400,3 +445,95 @@ Submit raw transaction to be relayed to monero network.
 
 > `status` is typically the response by the monero daemon attempting to relay
 > the transaction.
+
+#### `provision_subaddrs`
+Provision subaddresses at specified indexes. No two clients should ever receive
+the same newly provisioned subaddresses when calling this endpoint; the server
+should guarantee that newly provisioned subaddresses are fresh.
+
+**Request** object
+
+|   Field   |       Type       |                   Description                   |
+|-----------|------------------|-------------------------------------------------|
+| address   | `base58-address` | Standard address of the wallet                  |
+| view_key  | `binary`         | View key bytes                                  |
+| maj_i *   | `uint32`         | Subaddress major index (defaults to 0)          |
+| min_i *   | `uint32`         | Subaddress minor index (defaults to 0)          |
+| n_maj *   | `uint32`         | Number of major subaddresses to provision       |
+| n_min *   | `uint32`         | Number of minor subaddresses to provision       |
+| get_all * | `boolean`        | Whether to include all subaddresses in response |
+
+> The various combinations of `maj_i`, `min_i`, `n_maj`, and `n_min` behave
+> differently, but generally the server provisions subaddresses where it has not
+> already provisioned them, with the indexes specified as lower bounds.
+
+> If, for example, only `maj_i` is included, then the server should provision a
+> default number of minor subaddresses (e.g. 500) within that `maj_i`, wherever
+> minor subaddresses have not already been provisioned, starting with `min_i`
+> set to 0 as the lower bound.
+
+> If, for example, `maj_i`, `min_i`, `n_maj` and `n_min` are included, then the
+> server should provision `n_maj` majors wherever major subaddresses have not
+> already been provisioned starting with `maj_i` as the lower bound, and for
+> each major, provision `n_min` subaddresses starting with `min_i` as the lower
+> bound.
+
+> All combinations follow the above framework.
+
+> The server can choose to "pad" counts and provision *more* than a client
+> requests.
+
+> If the server cannot provision a specified number of subaddresses because the
+> server would provision more than the maximum number of subaddresses, HTTP 409
+> should be returned. Ack that the status code is not perfect here. In this
+> case, the client should make a new request either with a smaller requested
+> number of subaddresses to provision, or at a different major or minor index.
+
+> If none of `maj_i`, `min_i`, `n_maj`, and `n_min` are included in the request,
+> the server must return a HTTP 400 "Bad Request" error.
+
+> `get_all` defaults to true if not included in the request.
+
+**Response** object
+
+|     Field      |    Type    |                          Description                        |
+|----------------|------------|-------------------------------------------------------------|
+| new_subaddrs   | `subaddrs` | All new subaddresses provisioned in the request             |
+| all_subaddrs * | `subaddrs` | All subaddresses provisioned for the wallet (including new) |
+
+#### `upsert_subaddrs`
+Upsert subaddresses at the specified major and minor indexes. This endpoint is
+idempotent.
+
+**Request** object
+
+|   Field   |       Type       |                  Description                    |
+|-----------|------------------|-------------------------------------------------|
+| address   | `base58-address` | Standard address of the wallet                  |
+| view_key  | `binary`         | View key bytes                                  |
+| subaddrs  | `subaddrs`       | Subaddresses to upsert                          |
+| get_all * | `boolean`        | Whether to include all subaddresses in response |
+
+**Response** object
+
+|     Field      |    Type    |                          Description                        |
+|----------------|------------|-------------------------------------------------------------|
+| new_subaddrs   | `subaddrs` | All new subaddresses inserted in the request                |
+| all_subaddrs * | `subaddrs` | All subaddresses provisioned for the wallet (including new) |
+
+#### `get_subaddrs`
+
+Returns all subaddresses provisioned for a wallet.
+
+**Request** object
+
+|  Field   |       Type       |          Description           |
+|----------|------------------|--------------------------------|
+| address  | `base58-address` | Standard address of the wallet |
+| view_key | `binary`         | View key bytes                 |
+
+**Response** object
+
+|     Field    |    Type    |                Description                  |
+|--------------|------------|---------------------------------------------|
+| all_subaddrs | `subaddrs` | All subaddresses provisioned for the wallet |
