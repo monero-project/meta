@@ -142,25 +142,26 @@ blockchain timestamps do not have sub-seconds.
 
 **transaction** object
 
-|     Field      |           Type           |        Description        |
-|----------------|--------------------------|---------------------------|
-| id             | `uint64`                 | Index of tx in blockchain |
-| hash           | `binary`                 | Bytes of tx hash          |
-| timestamp *    | `timestamp`              | Timestamp of block        |
-| total_received | `uint64-string`          | Total XMR received        |
-| total_sent     | `uint64-string`          | XMR possibly being spent  |
-| unlock_time    | `uint64`                 | Tx unlock time field      |
-| height *       | `uint64`                 | Block height              |
-| spent_outputs  | array of `spend` objects | List of possible spends   |
-| payment_id *   | `binary`                 | Bytes of tx payment id    |
-| coinbase       | `boolean`                | True if tx is coinbase    |
-| mempool        | `boolean`                | True if tx is in mempool  |
-| mixin          | `uint32`                 | Mixin of the receive      |
+|     Field      |           Type           |        Description            |
+|----------------|--------------------------|-------------------------------|
+| id             | `uint64`                 | Index of tx in blockchain     |
+| hash           | `binary`                 | Bytes of tx hash              |
+| timestamp *    | `timestamp`              | Timestamp of block            |
+| total_received | `uint64-string`          | Total XMR received            |
+| total_sent     | `uint64-string`          | XMR possibly being spent      |
+| unlock_time    | `uint64`                 | Tx unlock time field          |
+| height *       | `uint64`                 | Block height                  |
+| block_hash *   | `binary`                 | Bytes of this tx's block hash |
+| spent_outputs  | array of `spend` objects | List of possible spends       |
+| payment_id *   | `binary`                 | Bytes of tx payment id        |
+| coinbase       | `boolean`                | True if tx is coinbase        |
+| mempool        | `boolean`                | True if tx is in mempool      |
+| mixin          | `uint32`                 | Mixin of the receive          |
 
 > `id` is determined by the monero daemon. It is the offset that a
 > transaction appears in the blockchain from the genesis block.
 
-> `timestamp` and `height` are not sent when `mempool` is true.
+> `timestamp`, `height` and `block_hash` are not sent when `mempool` is true.
 
 > `hash` is determined by how the monero core computes the hash.
 
@@ -248,24 +249,43 @@ spends is returned.
 
 **Request** object
 
-|   Field  |        Type      |             Description               |
-|----------|------------------|---------------------------------------|
-| address  | `base58-address` | Address to retrieve                   |
-| view_key | `binary`         | View key bytes for authorization      |
+|   Field               |        Type      |             Description                |
+|-----------------------|------------------|----------------------------------------|
+| address               | `base58-address` | Address to retrieve                    |
+| view_key              | `binary`         | View key bytes for authorization       |
+| since_tx_id *         | `uint64`         | Most recent tx already known to client |
+| since_tx_block_hash * | `binary`         | Block hash of most recent tx           |
 
 > If `address` is not authorized, the server must return a HTTP 403
 > "Forbidden" error.
+
+> `since_tx_id` and `since_tx_block_hash` may be omitted, in which case all
+> transactions are returned. If `since_tx_id` is present, `since_tx_block_hash`
+> must be, too. The latter is used to handle the case when a blockchain reorg
+> has rendered the requested `since_tx_id` invalid. Clients must take care to honor
+> the `since_tx_id` returned in the response, which may be different than the
+> value that was in the request.
 
 **Response** object
 
 |        Field         |             Type               |       Description         |
 |----------------------|--------------------------------|---------------------------|
+| since_tx_id *        | `uint64`                       | Most recent omitted tx    |
 | total_received       | `uint64-string`                | Sum of received outputs   |
 | scanned_height       | `uint64`                       | Current tx scan progress  |
 | scanned_block_height | `uint64`                       | Current scan progress     |
 | start_height         | `uint64`                       | Start height of response  |
 | blockchain_height    | `uint64`                       | Current blockchain height |
 | transactions         | array of `transaction` objects | Possible spend info       |
+
+> `since_tx_id` may be omitted, and shall be omitted if omitted in the request.
+> If present, it indicates that this response includes only transactions with
+> an `id` greater than this one. It may be different than the value in the
+> `request`: if a blockchain reorg has rendered the requested id/block_hash
+> pair invalid, then some or all of the prior transaction history must be
+> resent. Clients must remove all newer transactions from their local history
+> before appending the ones from this response. If null or omitted, the
+> response contains every transaction.
 
 #### `get_random_outs`
 Selects random outputs to use in a ring signature of a new transaction. If the
