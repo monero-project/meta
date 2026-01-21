@@ -326,7 +326,7 @@ was actually spent.
 | amount       | `uint64-string`           | The total value in outputs              |
 | outputs      | array of `output` objects | Outputs possibly available for spending |
 
-#### `import_request`
+#### `import_wallet_request`
 Request an account scan from the genesis block.
 
 **Request** object
